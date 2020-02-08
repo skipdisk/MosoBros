@@ -1,5 +1,5 @@
-import React, { Component } from 'react';
-import { connect, useDispatch } from 'react-redux';
+import React from 'react';
+import { useDispatch } from 'react-redux';
 import StripeCheckout from 'react-stripe-checkout';
 import { makeStyles } from '@material-ui/core/styles';
 import Button from '@material-ui/core/Button';
@@ -19,8 +19,8 @@ const Payments = () => {
 
     return (
         <StripeCheckout
-            name="iSurvey"
-            description="$5 for 5 email credits"
+            name="MosBros"
+            description="$5 for 5 images"
             amount={500}
             token={token => dispatch(handlePaymentToken(token))}
             stripeKey={process.env.REACT_APP_STRIPE_KEY}

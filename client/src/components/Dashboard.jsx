@@ -1,6 +1,8 @@
 import React from 'react'
 import { makeStyles } from '@material-ui/core/styles';
 
+
+
 const useStyles = makeStyles(theme => ({
     root: {
       flexGrow: 1,
@@ -8,15 +10,14 @@ const useStyles = makeStyles(theme => ({
     }
 }));
 
-const Landing = () => {
+const Dashboard = props => {
     const classes = useStyles();
     return (
         <div className={classes.root} >
-            <h1>
-                MosBros
-            </h1>
+            <h1>This is the Dashboard</h1>
         </div>
     )
 }
 
-export default Landing
+
+export default Dashboard

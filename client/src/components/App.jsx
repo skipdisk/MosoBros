@@ -5,10 +5,9 @@ import { connect } from 'react-redux';
 import { fetchUser } from '../store/actions/authActions';
 import Header from './Header';
 import Landing from './Landing';
+import Dashboard from './Dashboard';
 
 
-const Dashboard = () => <h2>Dashboard</h2>
-const SurveyNew = () => <h2>SurveyNew</h2>
 
 
 class App extends Component {
@@ -22,8 +21,7 @@ class App extends Component {
                     <div>
                         <Header/>
                         <Route exact path="/" component={Landing}/>
-                        <Route exact path="/surveys" component={Dashboard}/>
-                        <Route path="/surveys/new" components={SurveyNew}/>
+                        <Route path="/dashboard" component={Dashboard}/>
                     </div>
                 </BrowserRouter>
             </div>

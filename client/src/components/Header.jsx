@@ -59,7 +59,7 @@ const Header = ({auth}) => {
             <MenuIcon />
           </IconButton>
               <Typography variant="h6" className={classes.title}>
-                <Link to={auth ? '/surveys' : '/'}className={classes.brand}>iSurvey</Link>
+                <Link to={auth ? '/dashboard' : '/'}className={classes.brand}>MosBros</Link>
               </Typography>
             {renderContent()}
         </Toolbar>

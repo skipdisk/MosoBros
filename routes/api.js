@@ -32,7 +32,6 @@ module.exports = app => {
 
     app.post('/api/image-upload', imageUpload.single('file'), function (req, res, next) {
         console.log(req.file);
-        console.log('test')
         if (!req.file) {
             res.status(500);
             return next(err);

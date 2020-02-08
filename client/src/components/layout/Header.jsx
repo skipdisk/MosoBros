@@ -1,4 +1,4 @@
-import React , {Fragment} from 'react';
+import React, { Fragment } from 'react';
 import { makeStyles } from '@material-ui/core/styles';
 import { connect } from 'react-redux';
 import { Link } from 'react-router-dom';
@@ -9,7 +9,7 @@ import Button from '@material-ui/core/Button';
 import IconButton from '@material-ui/core/IconButton';
 import MenuIcon from '@material-ui/icons/Menu';
 
-import Payments from './Payments';
+import Payments from '../payment/Payments';
 
 const useStyles = makeStyles(theme => ({
   root: {
@@ -32,11 +32,11 @@ const useStyles = makeStyles(theme => ({
   }
 }));
 
-const Header = ({auth}) => {
+const Header = ({ auth }) => {
   const classes = useStyles();
 
   const renderContent = () => {
-    switch(auth) {
+    switch (auth) {
       case null:
         return;
       case false:
@@ -44,7 +44,7 @@ const Header = ({auth}) => {
       default:
         return (
           <Fragment>
-            <Payments/>
+            <Payments />
             <Typography>Credits: {auth.credits}</Typography>
             <Button><a className={classes.navButton} href="/api/logout">Logout</a></Button>
           </Fragment>
@@ -58,17 +58,17 @@ const Header = ({auth}) => {
           <IconButton edge="start" className={classes.menuButton} color="inherit" aria-label="menu">
             <MenuIcon />
           </IconButton>
-              <Typography variant="h6" className={classes.title}>
-                <Link to={auth ? '/dashboard' : '/'}className={classes.brand}>MosBros</Link>
-              </Typography>
-            {renderContent()}
+          <Typography variant="h6" className={classes.title}>
+            <Link to={auth ? '/dashboard' : '/'} className={classes.brand}>MosBros</Link>
+          </Typography>
+          {renderContent()}
         </Toolbar>
       </AppBar>
     </div>
   );
 }
 
-const mapStateToProps = ({auth}) => {
+const mapStateToProps = ({ auth }) => {
   console.log(auth)
   return {
     auth: auth

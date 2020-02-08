@@ -4,6 +4,8 @@ const keys = require('./config/keys');
 const cookieSession = require('cookie-session');
 const passport = require('passport');
 const morgan = require('morgan');
+const cors = require('cors');
+
 
 
 const bodyParser = require('body-parser');
@@ -16,6 +18,9 @@ require('./services/passport');
 mongoose.connect(keys.mongoURI, { useNewUrlParser: true });
 
 const app = express();
+
+// use it before all route definitions
+app.use(cors({ origin: '*' }));
 
 //body parser
 app.use(bodyParser.json());
@@ -40,6 +45,7 @@ app.use(express.static(__dirname));
 
 app.use(passport.initialize());
 app.use(passport.session());
+
 
 
 //mounts router

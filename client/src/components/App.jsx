@@ -3,15 +3,15 @@ import { BrowserRouter, Route } from 'react-router-dom'
 import { connect } from 'react-redux';
 //import * as actions from '../actions';
 import { fetchUser } from '../store/actions/authActions';
-import Header from './Header';
-import Landing from './Landing';
-import Dashboard from './Dashboard';
+import Header from './layout/Header';
+import Landing from './layout/Landing';
+import Dashboard from './layout/Dashboard';
 
 
 
 
 class App extends Component {
-    componentDidMount(){
+    componentDidMount() {
         this.props.fetchUser();
     }
     render() {
@@ -19,9 +19,9 @@ class App extends Component {
             <div>
                 <BrowserRouter>
                     <div>
-                        <Header/>
-                        <Route exact path="/" component={Landing}/>
-                        <Route path="/dashboard" component={Dashboard}/>
+                        <Header />
+                        <Route exact path="/" component={Landing} />
+                        <Route path="/dashboard" component={Dashboard} />
                     </div>
                 </BrowserRouter>
             </div>
@@ -32,7 +32,7 @@ class App extends Component {
 
 const mapDispatchToProps = dispatch => {
     return {
-      fetchUser: () => dispatch(fetchUser()),
+        fetchUser: () => dispatch(fetchUser()),
     };
 };
 

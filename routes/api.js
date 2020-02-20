@@ -1,6 +1,8 @@
 const keys = require('../config/keys');
 const stripe = require('stripe')(keys.stripeSecretKey);
 const imageUpload = require('../services/imageUpload');
+const { PythonShell } = require('python-shell');
+
 
 //pass in require login middleware
 const requireLogin = require('../middlewares/requireLogin')
@@ -32,6 +34,13 @@ module.exports = app => {
 
     app.post('/api/image-upload', imageUpload.single('file'), function (req, res, next) {
         console.log(req.file);
+
+        PythonShell.run('/Users/thien/Desktop/MosBros/MosBros/routes/image.py', null, function (err, results) {
+            if (err) throw err;
+            console.log(results);
+        });
+
+
         if (!req.file) {
             res.status(500);
             return next(err);

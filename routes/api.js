@@ -1,7 +1,11 @@
 const keys = require('../config/keys');
 const stripe = require('stripe')(keys.stripeSecretKey);
 const imageUpload = require('../services/imageUpload');
-const { PythonShell } = require('python-shell');
+
+const { spawn } = require('child_process');
+var fs = require('fs');
+
+
 
 
 //pass in require login middleware
@@ -33,19 +37,28 @@ module.exports = app => {
     });
 
     app.post('/api/image-upload', imageUpload.single('file'), function (req, res, next) {
-        console.log(req.file);
 
-        PythonShell.run('/Users/thien/Desktop/MosBros/MosBros/routes/image.py', null, function (err, results) {
-            if (err) throw err;
-            console.log(results);
+
+        var dataToSend;
+        // spawn new child process to call the python script
+        const python = spawn('python', ['/Users/thien/Desktop/MosBros/MosBros/routes/image.py', req.file.path]);
+        // collect data from script
+        python.stdout.on('data', function (data) {
+            console.log(data.toString());
+            dataToSend = data.toString();
         });
-
 
         if (!req.file) {
             res.status(500);
             return next(err);
         }
-        res.json({ fileUrl: 'http://localhost:3000/images/' + req.file.filename });
+
+        python.on('close', (code) => {
+            console.log(`child process close all stdio with code ${code}`);
+            // send data to browser
+            res.send(dataToSend)
+        });
+        // res.json({ fileUrl: 'http://localhost:3000/images/' + req.file.filename });
     })
 
 

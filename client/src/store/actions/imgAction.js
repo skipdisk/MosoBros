@@ -20,7 +20,6 @@ export const imageUpload = (image) => async dispatch => {
 
     // generate file from base64 string
     // const file = dataURLtoFile(image)
-
     // put file into form data
     const data = new FormData()
     data.append('file', image, image.name)

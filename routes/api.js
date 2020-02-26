@@ -41,7 +41,7 @@ module.exports = app => {
 
         var dataToSend;
         // spawn new child process to call the python script
-        const python = spawn('python', ['/Users/thien/Desktop/MosBros/MosBros/routes/image.py', req.file.path]);
+        const python = spawn('python', ['C:/Users/muckm/Desktop/image_processing/MosoBros/routes/image.py', req.file.path]);
         // collect data from script
         python.stdout.on('data', function (data) {
             console.log(data.toString());

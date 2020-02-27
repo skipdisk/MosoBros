@@ -1,29 +1,15 @@
 import axios from "axios";
 
-const addProject = newProject => {
-  let formData = new FormData();
-  formData.append("name", newProject.name);
-  formData.append("about", newProject.about);
-  formData.append("url", newProject.url);
-  formData.append("description", newProject.description);
-  formData.append("picture", newProject.picture[0]);
+var data;
 
-  return axios
-    .post(`http://localhost:3008/projects`, formData, {
-      headers: {
-        "Content-Type": "multipart/form-data"
-      }
-    })
-    .then(response => {
-      // JSON responses are automatically parsed.
-    })
-    .catch(e => {
-      this.errors.push(e);
-    });
-};
+const getData = () => {
+  return data;
+}
 
 function blobToCanvas(blob) {
   var newBlob = blob;
+  var stdDev = document.getElementById("standardDeviation");
+  var mean = document.getElementById("mean");
   var canvas = document.getElementsByClassName("canvas");
   var img = document.getElementsByClassName("img");
   const image = new Image();
@@ -34,12 +20,44 @@ function blobToCanvas(blob) {
     image.onload = function() {
       ctx.drawImage(image, 0, 0, pctx.width, pctx.height);
       var imageData = ctx.getImageData(0, 0, pctx.width, pctx.height);
-      var data = imageData.data;
+      data = imageData.data;
       for (var i = 0; i < img.length; i++) {
-      var imgclear = img[i];
-      imgclear.style.display = "none";
+        var imgclear = img[i];
+        imgclear.style.display = "none";
       }
-      // console.log(data);
+      console.log(data);
+
+      var getHistogram = () => {
+        var histogram = document.createElement("Histogram");
+        console.log(histogram);
+        var bin = Array.from(Array(256).keys());
+        histogram.yValues = data;
+        histogram.xLabels = bin;
+      };
+
+      // Arithmetic mean
+      let getMean = function(data) {
+        return (
+          data.reduce(function(a, b) {
+            return Number(a) + Number(b);
+          }) / data.length
+        );
+      };
+
+      mean.innerHTML = getMean(data);
+
+      // Standard deviation
+      let getSD = function(data) {
+        let m = getMean(data);
+        return Math.sqrt(
+          data.reduce(function(sq, n) {
+            return sq + Math.pow(n - m, 2);
+          }, 0) /
+            (data.length - 1)
+        );
+      };
+
+      stdDev.innerHTML = getSD(data);
 
       function convertCanvasToImage(canvas) {
         image.src = canvas.toDataURL("image/png");
@@ -210,4 +228,4 @@ function blobToCanvas(blob) {
   }
 }
 
-export { addProject, blobToCanvas };
+export { blobToCanvas, getData };

@@ -15,7 +15,6 @@ const Dashboard = props => {
     const classes = useStyles();
     return (
         <div className={classes.root} >
-            <h1>This is the Dashboard</h1>
             <ImageContainer />
         </div>
     )

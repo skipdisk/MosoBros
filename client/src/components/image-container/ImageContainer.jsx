@@ -22,8 +22,19 @@ const ImageContainer = () => {
   const dispatch = useDispatch();
   const [pictures, setPictures] = useState([]);
   const pictureRef = useRef(null);
+  const [canvasSize, setCanvasSize] = useState([0, 0])
+
+  const changeCanvasSize = (imageUrl) => {
+    var img = new Image();
+    img.onload = function () {
+      console.log(img.width + ' ' + img.height);
+      setCanvasSize([img.height, img.width])
+    };
+    img.src = imageUrl;
+  }
 
   const onDrop = (pictureFiles, pictureDataURLs) => {
+    changeCanvasSize(pictureDataURLs)
     setPictures(pictures.concat(pictureDataURLs));
     if (pictures.length > 1) {
       setPictures(pictures.pop());
@@ -31,33 +42,21 @@ const ImageContainer = () => {
   };
 
   const uploadImages = () => {
-    // console.log(pictureRef.current.toDataURL())
-    // pictures.forEach(pic => {
-    //   dispatch(imageUpload(pic));
-    // });
     dispatch(imageUpload(pictureRef.current.toDataURL()))
   };
 
 
   return (
-    <div>
-      <ImageUploader
-        withIcon={true}
-        buttonText="Choose images"
-        onChange={onDrop}
-        imgExtension={[".jpg", ".gif", ".png", ".gif", ".jpeg"]}
-        maxFileSize={5242880}
-        singleImage={true}
-        withPreview={true}
-      />
+    <div >
       <div
         style={{
           display: "flex",
           justifyContent: "center",
-          alignItems: "center"
+          alignItems: "center",
+          marginTop: '1rem'
         }}
       >
-        <canvas ref={pictureRef} className="canvas" height={300} width={300}></canvas>
+        <canvas ref={pictureRef} className="canvas" height={canvasSize[0]} width={canvasSize[1]}></canvas>
       </div>
       {pictures.length > 0 && Array.isArray(pictures) && (
         <div
@@ -72,13 +71,12 @@ const ImageContainer = () => {
               <li key={i}>
                 <img
                   className="img"
-                  height={300}
-                  width={300}
+                  height={canvasSize[0]}
+                  width={canvasSize[1]}
                   key={i}
                   src={file}
                   onLoad={() => {
                     api.blobToCanvas(file)
-
                   }}
                   alt="preview"
                 />
@@ -149,6 +147,15 @@ const ImageContainer = () => {
         </div>
       )}
       <Button onClick={uploadImages}>Submit</Button>
+      <ImageUploader
+        withIcon={true}
+        buttonText="Choose images"
+        onChange={onDrop}
+        imgExtension={[".jpg", ".gif", ".png", ".gif", ".jpeg"]}
+        maxFileSize={5242880}
+        singleImage={true}
+      // withPreview={true}
+      />
     </div>
   );
 };

@@ -31,13 +31,13 @@ function blobToCanvas(blob) {
     var pctx = canvas[i];
     var ctx = pctx.getContext("2d");
     image.src = newBlob;
-    image.onload = function() {
+    image.onload = function () {
       ctx.drawImage(image, 0, 0, pctx.width, pctx.height);
       var imageData = ctx.getImageData(0, 0, pctx.width, pctx.height);
       var data = imageData.data;
       for (var i = 0; i < img.length; i++) {
-      var imgclear = img[i];
-      imgclear.style.display = "none";
+        var imgclear = img[i];
+        imgclear.style.display = "none";
       }
       // console.log(data);
 
@@ -46,7 +46,7 @@ function blobToCanvas(blob) {
       }
 
       //INVERT COLORS OF PICTURE
-      var invert = function() {
+      var invert = function () {
         for (var i = 0; i < data.length; i += 4) {
           data[i] = 255 - data[i]; // red
           data[i + 1] = 255 - data[i + 1]; // green
@@ -56,7 +56,7 @@ function blobToCanvas(blob) {
       };
 
       //GRAYSCALE COLORS OF PICTURE
-      var grayscale = function() {
+      var grayscale = function () {
         for (var i = 0; i < data.length; i += 4) {
           var avg = (data[i] + data[i + 1] + data[i + 2]) / 3;
           data[i] = avg; // red
@@ -66,8 +66,59 @@ function blobToCanvas(blob) {
         ctx.putImageData(imageData, 0, 0);
       };
 
+      function blurringHelper(imageData, callback) {
+
+        for (var i = 0; i < data.length; i += 4) {
+          var r = data[i];
+          var g = data[i + 1];
+          var b = data[i + 2];
+          var a = data[i + 3];
+
+          var channels = callback(r, g, b, a, imageData.data, i);
+
+
+          imageData.data[i] = channels.r;
+          imageData.data[i + 1] = channels.g;
+          imageData.data[i + 2] = channels.b;
+          imageData.data[i + 3] = channels.a;
+          // 
+        }
+
+        ctx.putImageData(imageData, 0, 0);
+      }
+
+      //Uses the gaussian blur on the pictures on a 3x3 area
+      function blurring() {
+        const w = pctx.width * 4;
+        // the offset index for each pixel excluding the center pixel
+        const grid = [-w - 4, -w, -w + 4, -4, 4, w - 4, w, w + 4];
+
+        blurringHelper(imageData, (r, g, b, a, dat, i) => {
+          var idx, count;
+          r *= r;
+          g *= g;
+          b *= b;
+          count = 1;
+          for (idx = 0; idx < grid.length; idx++) {
+            const off = grid[idx];
+            if (i + off >= 0 && i + off < w * pctx.height) {
+              r += dat[i + off] * dat[i + off];
+              g += dat[i + 1 + off] * dat[i + 1 + off];
+              b += dat[i + 2 + off] * dat[i + 2 + off];
+              a += dat[i + 3 + off];
+              count++;
+            }
+          }
+          r = Math.sqrt(r / count);
+          g = Math.sqrt(g / count);
+          b = Math.sqrt(b / count);
+          a = a / count;
+          return { r, g, b, a };
+        });
+      }
+
       //BRIGHTNESS OF PICTURE
-      var applyBrightness = function(data, brightness) {
+      var applyBrightness = function (data, brightness) {
         for (var i = 0; i < data.length; i += 4) {
           data[i] += 255 * (brightness / 100);
           data[i + 1] += 255 * (brightness / 100);
@@ -85,7 +136,7 @@ function blobToCanvas(blob) {
 
         return value;
       }
-      var applyContrast = function(data, contrast) {
+      var applyContrast = function (data, contrast) {
         var factor =
           (259.0 * (contrast + 255.0)) / (255.0 * (259.0 - contrast));
 
@@ -97,7 +148,7 @@ function blobToCanvas(blob) {
       };
 
       //DECREASE CONTRAST OF PICTURE
-      var dcontrast = function() {
+      var dcontrast = function () {
         var contrast = 10;
         contrast = contrast / 100 + 1;
         var intercept = 128 * (1 - contrast);
@@ -173,7 +224,7 @@ function blobToCanvas(blob) {
       var contrastSlider = document.getElementById("contrastRange");
       var contrastOutput = document.getElementById("contrastOutput");
       contrastOutput.innerHTML = contrastSlider.value;
-      contrastSlider.addEventListener("input", function() {
+      contrastSlider.addEventListener("input", function () {
         contrastSlider.value = this.value;
         contrastOutput.innerHTML = this.value;
         ctx.drawImage(image, 0, 0, pctx.width, pctx.height);
@@ -187,7 +238,7 @@ function blobToCanvas(blob) {
       var brightnessSlider = document.getElementById("brightnessRange");
       var brightnessOutput = document.getElementById("brightnessOutput");
       brightnessOutput.innerHTML = brightnessSlider.value;
-      brightnessSlider.addEventListener("input", function() {
+      brightnessSlider.addEventListener("input", function () {
         brightnessSlider.value = this.value;
         brightnessOutput.innerHTML = this.value;
         ctx.drawImage(image, 0, 0, pctx.width, pctx.height);
@@ -202,6 +253,8 @@ function blobToCanvas(blob) {
       invertbtn.addEventListener("click", invert);
       var grayscalebtn = document.getElementById("grayscalebtn");
       grayscalebtn.addEventListener("click", grayscale);
+      var blurringbtn = document.getElementById("blurringbtn");
+      blurringbtn.addEventListener("click", blurring);
 
       //SMOOTH BUTTON
       // var smoothbtn = document.getElementById("smoothbtn");

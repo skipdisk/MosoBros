@@ -1,5 +1,4 @@
 import React, { useState, useRef } from "react";
-import ImageEditor from "@toast-ui/react-image-editor";
 import { Button } from "@material-ui/core";
 import { makeStyles } from "@material-ui/core/styles";
 import { useDispatch } from "react-redux";
@@ -9,8 +8,6 @@ import * as api from "../../functions/api.js";
 import { Row } from "react-bootstrap";
 
 import Sketch from "react-p5";
-
-import "./image.css";
 
 const useStyles = makeStyles({
   root: {
@@ -93,6 +90,7 @@ const ImageContainer = () => {
               <input id="smoothbtn" value="Smooth" type="button" />
               <input id="grayscalebtn" value="Grayscale" type="button" />
               <input id="invertbtn" value="Invert" type="button" />
+              <input id="blurringbtn" value="Blurring" type="button" />
             </div>
             <div
               style={{

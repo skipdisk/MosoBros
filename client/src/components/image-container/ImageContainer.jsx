@@ -6,6 +6,10 @@ import { imageUpload } from "../../store/actions/imgAction";
 import ImageUploader from "react-images-upload";
 import * as api from "../../functions/api.js";
 import { Row } from "react-bootstrap";
+import ImageGalleryContainer from "../image-gallery/ImageGalleryContainer"
+
+
+
 
 import Sketch from "react-p5";
 
@@ -14,6 +18,7 @@ const useStyles = makeStyles({
     flexGrow: 1
   }
 });
+
 
 const ImageContainer = () => {
   const dispatch = useDispatch();
@@ -27,6 +32,8 @@ const ImageContainer = () => {
       console.log(img.width + ' ' + img.height);
       setCanvasSize([img.height, img.width])
     };
+
+
     img.src = imageUrl;
   }
 
@@ -154,6 +161,7 @@ const ImageContainer = () => {
         singleImage={true}
       // withPreview={true}
       />
+      {/* <ImageGalleryContainer /> */}
     </div>
   );
 };

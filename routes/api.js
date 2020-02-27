@@ -1,6 +1,9 @@
 const keys = require('../config/keys');
 const stripe = require('stripe')(keys.stripeSecretKey);
 const imageUpload = require('../services/imageUpload');
+const express = require('express');
+const path = require('path');
+
 
 const { spawn } = require('child_process');
 var fs = require('fs');
@@ -36,31 +39,40 @@ module.exports = app => {
         res.send(req.user);
     });
 
-    app.post('/api/image-upload', imageUpload.single('file'), function (req, res, next) {
+    app.get('/api/images', (req, res) => {
+        res.send(req.user);
+    });
 
-        console.log(req.file)
-        var dataToSend;
-        // spawn new child process to call the python script
-        const python = spawn('python', ['/Users/thien/Desktop/MosBros/routes/image.py', req.file.path]);
+    app.post('/api/image-upload', imageUpload.single('file'), async function (req, res, next) {
 
-        // collect data from script
-        python.stdout.on('data', function (data) {
-            console.log(data.toString());
-            dataToSend = data.toString();
-        });
+        req.user.images.push('http://localhost:5000/services/uploads/' + req.file.filename)
+        const user = await req.user.save()
+        res.send(user.images);
+
 
         if (!req.file) {
             res.status(500);
             return next(err);
         }
 
-        python.on('close', (code) => {
-            console.log(`child process close all stdio with code ${code}`);
-            // send data to browser
-            res.send(dataToSend)
-        });
-        // res.json({ fileUrl: 'http://localhost:3000/images/' + req.file.filename });
+        // var dataToSend;
+        // // spawn new child process to call the python script
+        // const python = spawn('python', ['/Users/thien/Desktop/MosBros/routes/image.py', req.file.path]);
+
+        // // collect data from script
+        // python.stdout.on('data', function (data) {
+        //     console.log(data.toString());
+        //     dataToSend = data.toString();
+        // });
+
+        // python.on('close', (code) => {
+        //     console.log(`child process close all stdio with code ${code}`);
+        //     // send data to browser
+        //     res.send(dataToSend)
+        // });
     })
 
+    //links upload folder for api to be able to access it in localhost:5000/api/services/uploads/:imageName
+    app.get("/", express.static(path.join(__dirname, "/api/services/uploads")));
 
 };

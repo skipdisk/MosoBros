@@ -1,6 +1,5 @@
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
 import ImageEditor from "@toast-ui/react-image-editor";
-import "tui-image-editor/dist/tui-image-editor.css";
 import { Button } from "@material-ui/core";
 import { makeStyles } from "@material-ui/core/styles";
 import { useDispatch } from "react-redux";
@@ -22,6 +21,7 @@ const useStyles = makeStyles({
 const ImageContainer = () => {
   const dispatch = useDispatch();
   const [pictures, setPictures] = useState([]);
+  const pictureRef = useRef(null);
 
   const onDrop = (pictureFiles, pictureDataURLs) => {
     setPictures(pictures.concat(pictureDataURLs));
@@ -31,10 +31,13 @@ const ImageContainer = () => {
   };
 
   const uploadImages = () => {
-    pictures.forEach(pic => {
-      dispatch(imageUpload(pic));
-    });
+    // console.log(pictureRef.current.toDataURL())
+    // pictures.forEach(pic => {
+    //   dispatch(imageUpload(pic));
+    // });
+    dispatch(imageUpload(pictureRef.current.toDataURL()))
   };
+
 
   return (
     <div>
@@ -54,7 +57,7 @@ const ImageContainer = () => {
           alignItems: "center"
         }}
       >
-        <canvas className="canvas" height={300} width={300}></canvas>
+        <canvas ref={pictureRef} className="canvas" height={300} width={300}></canvas>
       </div>
       {pictures.length > 0 && Array.isArray(pictures) && (
         <div
@@ -73,7 +76,10 @@ const ImageContainer = () => {
                   width={300}
                   key={i}
                   src={file}
-                  onLoad={api.blobToCanvas(file)}
+                  onLoad={() => {
+                    api.blobToCanvas(file)
+
+                  }}
                   alt="preview"
                 />
                 <p>{file.name}</p>

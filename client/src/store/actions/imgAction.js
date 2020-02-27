@@ -30,7 +30,6 @@ export const imageUpload = (imgURL) => async dispatch => {
     // const image = dataURLtoFile(img)
     var image = dataURItoBlob(imgURL);
 
-    console.log(image)
     // put file into form data
     const data = new FormData(document.forms[0])
     data.append('file', image, image.name)

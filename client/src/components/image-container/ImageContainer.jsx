@@ -5,10 +5,9 @@ import { useDispatch } from "react-redux";
 import { imageUpload } from "../../store/actions/imgAction";
 import ImageUploader from "react-images-upload";
 import * as api from "../../functions/api.js";
+import Histogram from "react-chart-histogram";
 import { Row } from "react-bootstrap";
 import ImageGalleryContainer from "../image-gallery/ImageGalleryContainer"
-
-
 
 
 import Sketch from "react-p5";
@@ -23,6 +22,10 @@ const useStyles = makeStyles({
 const ImageContainer = () => {
   const dispatch = useDispatch();
   const [pictures, setPictures] = useState([]);
+  var bin = [];
+  var data = [];
+  var isGraph = false;
+  var options = { fillColor: "#FFFFFF", strokeColor: "#0000FF", fontSize: "small"};
   const pictureRef = useRef(null);
   const [canvasSize, setCanvasSize] = useState([0, 0])
 
@@ -49,9 +52,20 @@ const ImageContainer = () => {
     dispatch(imageUpload(pictureRef.current.toDataURL()))
   };
 
+  const drawGraph = () => {
+    isGraph = true;
+    data = api.getData();
+    bin = Array.from(Array(256).keys());
+  };
 
   return (
     <div >
+    <p>
+        Standard Deviation: <span id="standardDeviation" />
+      </p>
+      <p>
+        Mean: <span id="mean" />
+      </p>
       <div
         style={{
           display: "flex",
@@ -148,7 +162,19 @@ const ImageContainer = () => {
                 Value: <span id="contrastOutput" />
               </p>
             </div>
+            <Button onClick={drawGraph}>Graph</Button>
           </ul>
+        </div>
+      )}
+      {isGraph && (
+        <div>
+          <Histogram
+            xLabels={bin}
+            yValues={data}
+            height="200"
+            width="800"
+            options={options}
+          />
         </div>
       )}
       <Button onClick={uploadImages}>Submit</Button>

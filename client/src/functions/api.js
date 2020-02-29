@@ -1,31 +1,19 @@
 import axios from "axios";
 
-const addProject = newProject => {
-  let formData = new FormData();
-  formData.append("name", newProject.name);
-  formData.append("about", newProject.about);
-  formData.append("url", newProject.url);
-  formData.append("description", newProject.description);
-  formData.append("picture", newProject.picture[0]);
+var data;
 
-  return axios
-    .post(`http://localhost:3008/projects`, formData, {
-      headers: {
-        "Content-Type": "multipart/form-data"
-      }
-    })
-    .then(response => {
-      // JSON responses are automatically parsed.
-    })
-    .catch(e => {
-      this.errors.push(e);
-    });
+const getData = () => {
+  return data;
 };
 
 function blobToCanvas(blob) {
   var newBlob = blob;
+  var stdDev = document.getElementById("standardDeviation");
+  var mean = document.getElementById("mean");
   var canvas = document.getElementsByClassName("canvas");
   var img = document.getElementsByClassName("img");
+  var oldBrightnessvalue = 0;
+  var oldContrastvalue = 0;
   const image = new Image();
   for (var i = 0; i < canvas.length; i++) {
     var pctx = canvas[i];
@@ -34,16 +22,44 @@ function blobToCanvas(blob) {
     image.onload = function () {
       ctx.drawImage(image, 0, 0, pctx.width, pctx.height);
       var imageData = ctx.getImageData(0, 0, pctx.width, pctx.height);
-      var data = imageData.data;
+      data = imageData.data;
       for (var i = 0; i < img.length; i++) {
         var imgclear = img[i];
         imgclear.style.display = "none";
       }
       // console.log(data);
 
-      function convertCanvasToImage(canvas) {
-        image.src = canvas.toDataURL("image/png");
-      }
+      var getHistogram = () => {
+        var histogram = document.createElement("Histogram");
+        console.log(histogram);
+        var bin = Array.from(Array(256).keys());
+        histogram.yValues = data;
+        histogram.xLabels = bin;
+      };
+
+      // Arithmetic mean
+      let getMean = function (data) {
+        return (
+          data.reduce(function (a, b) {
+            return Number(a) + Number(b);
+          }) / data.length
+        );
+      };
+
+      mean.innerHTML = getMean(data);
+
+      // Standard deviation
+      let getSD = function (data) {
+        let m = getMean(data);
+        return Math.sqrt(
+          data.reduce(function (sq, n) {
+            return sq + Math.pow(n - m, 2);
+          }, 0) /
+          (data.length - 1)
+        );
+      };
+
+      stdDev.innerHTML = getSD(data);
 
       //INVERT COLORS OF PICTURE
       var invert = function () {
@@ -67,7 +83,6 @@ function blobToCanvas(blob) {
       };
 
       function blurringHelper(imageData, callback) {
-
         for (var i = 0; i < data.length; i += 4) {
           var r = data[i];
           var g = data[i + 1];
@@ -76,12 +91,11 @@ function blobToCanvas(blob) {
 
           var channels = callback(r, g, b, a, imageData.data, i);
 
-
           imageData.data[i] = channels.r;
           imageData.data[i + 1] = channels.g;
           imageData.data[i + 2] = channels.b;
           imageData.data[i + 3] = channels.a;
-          // 
+          //
         }
 
         ctx.putImageData(imageData, 0, 0);
@@ -124,13 +138,11 @@ function blobToCanvas(blob) {
 
       //BRIGHTNESS OF PICTURE
       var applyBrightness = function (data, brightness) {
-        const newData = []
         for (var i = 0; i < data.length; i += 4) {
-          newData[i] = (data[i] += 255 * (brightness / 100));
-          newData[i + 1] = (data[i + 1] += 255 * (brightness / 100));
-          newData[i + 2] = (data[i + 2] += 255 * (brightness / 100));
+          data[i] = data[i] += 255 * (brightness / 100);
+          data[i + 1] = data[i + 1] += 255 * (brightness / 100);
+          data[i + 2] = data[i + 2] += 255 * (brightness / 100);
         }
-        return newData
       };
 
       //CONTRAST OF PICTURE
@@ -152,6 +164,7 @@ function blobToCanvas(blob) {
           data[i + 1] = truncateColor(factor * (data[i + 1] - 128.0) + 128.0);
           data[i + 2] = truncateColor(factor * (data[i + 2] - 128.0) + 128.0);
         }
+        return;
       };
 
       //DECREASE CONTRAST OF PICTURE
@@ -233,10 +246,18 @@ function blobToCanvas(blob) {
       contrastOutput.innerHTML = contrastSlider.value;
       contrastSlider.addEventListener("input", function () {
         contrastSlider.value = this.value;
+        oldContrastvalue =
+          this.value > oldContrastvalue ?
+          parseInt(this.value) - 1 :
+          parseInt(this.value) + 1;
+        // console.log(oldContrastvalue);
         contrastOutput.innerHTML = this.value;
-        ctx.drawImage(image, 0, 0, pctx.width, pctx.height);
-        imageData = ctx.getImageData(0, 0, pctx.width, pctx.height);
-        applyContrast(imageData.data, parseInt(contrastSlider.value, 10));
+        // ctx.drawImage(image, 0, 0, pctx.width, pctx.height);
+        // imageData = ctx.getImageData(0, 0, pctx.width, pctx.height);
+        applyContrast(
+          imageData.data,
+          parseInt(contrastSlider.value - oldContrastvalue, 10)
+        );
         ctx.putImageData(imageData, 0, 0);
         data = imageData.data;
       });
@@ -247,13 +268,30 @@ function blobToCanvas(blob) {
       brightnessOutput.innerHTML = brightnessSlider.value;
       brightnessSlider.addEventListener("input", function () {
         brightnessSlider.value = this.value;
-        brightnessOutput.innerHTML = this.value;
-        ctx.drawImage(image2, 0, 0, pctx.width, pctx.height);
-        var imageData2 = ctx.getImageData(0, 0, pctx.width, pctx.height);
+        if (this.value > oldBrightnessvalue) {
+          brightnessOutput.innerHTML = this.value;
+          applyBrightness(imageData.data, 1);
+          oldBrightnessvalue = (this.value);
+        } else {
+          brightnessOutput.innerHTML = this.value;
+          applyBrightness(imageData.data, -1);
+          oldBrightnessvalue = (this.value);
+        }
+        // oldBrightnessvalue =
+        //   this.value > oldBrightnessvalue
+        //     ? parseInt(this.value) - 1
+        //     : parseInt(this.value) + 1;
+        // console.log(oldBrightnessvalue);
+        // brightnessOutput.innerHTML = this.value;
+        // ctx.drawImage(image, 0, 0, pctx.width, pctx.height);
         // imageData = ctx.getImageData(0, 0, pctx.width, pctx.height);
-        const modifiedData = applyBrightness(imageData2.data, parseInt(brightnessSlider.value, 10));
+        // console.log(parseInt(brightnessSlider.value - oldBrightnessvalue), 10);
+        // applyBrightness(
+        //   imageData.data,
+        //   parseInt(brightnessSlider.value - oldBrightnessvalue, 10)
+        // );
         ctx.putImageData(imageData, 0, 0);
-        data = modifiedData;
+        data = imageData.data;
 
       });
 
@@ -273,6 +311,6 @@ function blobToCanvas(blob) {
 }
 
 export {
-  addProject,
-  blobToCanvas
+  blobToCanvas,
+  getData
 };

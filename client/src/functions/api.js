@@ -134,9 +134,9 @@ function blobToCanvas(blob) {
       //BRIGHTNESS OF PICTURE
       var applyBrightness = function(data, brightness) {
         for (var i = 0; i < data.length; i += 4) {
-          data[i] = data[i] += 255 * (brightness / 100);
-          data[i + 1] = data[i + 1] += 255 * (brightness / 100);
-          data[i + 2] = data[i + 2] += 255 * (brightness / 100);
+          data[i] = data[i] += brightness;
+          data[i + 1] = data[i + 1] += brightness;
+          data[i + 2] = data[i + 2] += brightness;
         }
       };
 
@@ -266,11 +266,11 @@ function blobToCanvas(blob) {
         if (this.value > oldBrightnessvalue) {
           brightnessOutput.innerHTML = this.value;
           applyBrightness(imageData.data, 1);
-          oldBrightnessvalue = this.value;
+          oldBrightnessvalue += 1;
         } else {
           brightnessOutput.innerHTML = this.value;
           applyBrightness(imageData.data, -1);
-          oldBrightnessvalue = this.value;
+          oldBrightnessvalue -= 1;
         }
         // oldBrightnessvalue =
         //   this.value > oldBrightnessvalue

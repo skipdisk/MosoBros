@@ -113,17 +113,24 @@ function blobToCanvas(blob) {
           g = Math.sqrt(g / count);
           b = Math.sqrt(b / count);
           a = a / count;
-          return { r, g, b, a };
+          return {
+            r,
+            g,
+            b,
+            a
+          };
         });
       }
 
       //BRIGHTNESS OF PICTURE
       var applyBrightness = function (data, brightness) {
+        const newData = []
         for (var i = 0; i < data.length; i += 4) {
-          data[i] += 255 * (brightness / 100);
-          data[i + 1] += 255 * (brightness / 100);
-          data[i + 2] += 255 * (brightness / 100);
+          newData[i] = (data[i] += 255 * (brightness / 100));
+          newData[i + 1] = (data[i + 1] += 255 * (brightness / 100));
+          newData[i + 2] = (data[i + 2] += 255 * (brightness / 100));
         }
+        return newData
       };
 
       //CONTRAST OF PICTURE
@@ -241,11 +248,13 @@ function blobToCanvas(blob) {
       brightnessSlider.addEventListener("input", function () {
         brightnessSlider.value = this.value;
         brightnessOutput.innerHTML = this.value;
-        ctx.drawImage(image, 0, 0, pctx.width, pctx.height);
-        imageData = ctx.getImageData(0, 0, pctx.width, pctx.height);
-        applyBrightness(imageData.data, parseInt(brightnessSlider.value, 10));
+        ctx.drawImage(image2, 0, 0, pctx.width, pctx.height);
+        var imageData2 = ctx.getImageData(0, 0, pctx.width, pctx.height);
+        // imageData = ctx.getImageData(0, 0, pctx.width, pctx.height);
+        const modifiedData = applyBrightness(imageData2.data, parseInt(brightnessSlider.value, 10));
         ctx.putImageData(imageData, 0, 0);
-        data = imageData.data;
+        data = modifiedData;
+
       });
 
       //INVERT AND GRASCALE BUTTONS
@@ -263,4 +272,7 @@ function blobToCanvas(blob) {
   }
 }
 
-export { addProject, blobToCanvas };
+export {
+  addProject,
+  blobToCanvas
+};

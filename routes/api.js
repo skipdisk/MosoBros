@@ -3,6 +3,9 @@ const stripe = require('stripe')(keys.stripeSecretKey)
 const imageUpload = require('../services/imageUpload')
 const express = require('express')
 const path = require('path')
+const {
+    createHistogram
+} = require('../client/src/store/actions/createHistogram')
 
 const {
     spawn
@@ -34,8 +37,10 @@ module.exports = app => {
         res.send(req.user)
     })
 
-    app.get('/api/images', (req, res) => {
-        res.send(req.user)
+    app.post('/api/histogram', async (req, res) => {
+        // const histograms = createHistogram(req.image)
+        console.log(req)
+        // res.send(histograms)
     })
 
     app.post('/api/image-upload', imageUpload.single('file'), async function (

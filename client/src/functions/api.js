@@ -272,7 +272,7 @@ function blobToCanvas(blob) {
           brightnessOutput.innerHTML = this.value;
           applyBrightness(imageData.data, 1);
           oldBrightnessvalue += 1;
-        } else {
+        } else if (this.value < oldBrightnessvalue) {
           brightnessOutput.innerHTML = this.value;
           applyBrightness(imageData.data, -1);
           oldBrightnessvalue -= 1;

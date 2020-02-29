@@ -1,5 +1,3 @@
-import axios from "axios";
-
 var data;
 
 const getData = () => {
@@ -134,9 +132,22 @@ function blobToCanvas(blob) {
       //BRIGHTNESS OF PICTURE
       var applyBrightness = function(data, brightness) {
         for (var i = 0; i < data.length; i += 4) {
-          data[i] = data[i] += brightness;
-          data[i + 1] = data[i + 1] += brightness;
-          data[i + 2] = data[i + 2] += brightness;
+          if (
+            data[i] != 255 ||
+            data[i] != 0 ||
+            data[i + 1] != 255 ||
+            data[i + 1] != 0 ||
+            data[i + 2] != 255 ||
+            data[i + 2] != 0
+          ) {
+            data[i] = truncateColor((data[i] += brightness));
+            data[i + 1] = truncateColor((data[i + 1] += brightness));
+            data[i + 2] = truncateColor((data[i + 2] += brightness));
+          } else {
+            console.log(data[i]);
+            console.log(data[i + 1]);
+            console.log(data[i + 2]);
+          }
         }
       };
 
@@ -263,28 +274,37 @@ function blobToCanvas(blob) {
       brightnessOutput.innerHTML = brightnessSlider.value;
       brightnessSlider.addEventListener("input", function() {
         brightnessSlider.value = this.value;
-        if (this.value > oldBrightnessvalue) {
-          brightnessOutput.innerHTML = this.value;
-          applyBrightness(imageData.data, 1);
-          oldBrightnessvalue += 1;
+        if (this.value > 0) {
+          if (this.value > oldBrightnessvalue) {
+            console.log("up");
+            brightnessOutput.innerHTML = this.value;
+            applyBrightness(imageData.data, 1);
+            oldBrightnessvalue = this.value;
+          } else if (this.value < oldBrightnessvalue) {
+            console.log("down");
+            brightnessOutput.innerHTML = this.value;
+            applyBrightness(imageData.data, -1);
+            oldBrightnessvalue = this.value;
+          } else {
+            console.log("yeet");
+            oldBrightnessvalue = this.value;
+          }
         } else {
-          brightnessOutput.innerHTML = this.value;
-          applyBrightness(imageData.data, -1);
-          oldBrightnessvalue -= 1;
+          if (this.value < oldBrightnessvalue) {
+            console.log("up");
+            brightnessOutput.innerHTML = this.value;
+            applyBrightness(imageData.data, 1);
+            oldBrightnessvalue = this.value;
+          } else if (this.value > oldBrightnessvalue) {
+            console.log("down");
+            brightnessOutput.innerHTML = this.value;
+            applyBrightness(imageData.data, -1);
+            oldBrightnessvalue = this.value;
+          } else {
+            console.log("yeet");
+            oldBrightnessvalue = this.value;
+          }
         }
-        // oldBrightnessvalue =
-        //   this.value > oldBrightnessvalue
-        //     ? parseInt(this.value) - 1
-        //     : parseInt(this.value) + 1;
-        // console.log(oldBrightnessvalue);
-        // brightnessOutput.innerHTML = this.value;
-        // ctx.drawImage(image, 0, 0, pctx.width, pctx.height);
-        // imageData = ctx.getImageData(0, 0, pctx.width, pctx.height);
-        // console.log(parseInt(brightnessSlider.value - oldBrightnessvalue), 10);
-        // applyBrightness(
-        //   imageData.data,
-        //   parseInt(brightnessSlider.value - oldBrightnessvalue, 10)
-        // );
         ctx.putImageData(imageData, 0, 0);
         data = imageData.data;
       });

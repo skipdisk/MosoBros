@@ -19,29 +19,29 @@ def changeContrast(imagePath):
     pixels = img.load() # create the pixel map
 
 
-    imin = 255
-    imax = 1
+    # imin = 255
+    # imax = 1
 
-    # Find minimum and maximum luminosity
-    for x in range(img.size[0]):
-        for y in range(img.size[1]):
-            r, g, b = pixels[x, y]
-            i = (r + g + b) / 3
-            imin = min(imin, i)
-            imax = max(imax, i)
+    # # Find minimum and maximum luminosity
+    # for x in range(img.size[0]):
+    #     for y in range(img.size[1]):
+    #         r, g, b = pixels[x, y]
+    #         i = (r + g + b) / 3
+    #         imin = min(imin, i)
+    #         imax = max(imax, i)
 
-    # Generate image
-    for x in range(img.size[0]):
-        for y in range(img.size[1]):
-            r, g, b = pixels[x, y]
-            # Current luminosity
-            i = (r + g + b) / 3
-            # New luminosity
-            ip = 255 * (i - imin) / (imax - imin)
-            r = int(r * ip / (i or 1))
-            g = int(g * ip / (i or 1))
-            b = int(b * ip / (i or 1))
-            pixels[x,y] = (r, g, b)
+    # # Generate image
+    # for x in range(img.size[0]):
+    #     for y in range(img.size[1]):
+    #         r, g, b = pixels[x, y]
+    #         # Current luminosity
+    #         i = (r + g + b) / 3
+    #         # New luminosity
+    #         ip = 255 * (i - imin) / (imax - imin)
+    #         r = int(r * ip / (i or 1))
+    #         g = int(g * ip / (i or 1))
+    #         b = int(b * ip / (i or 1))
+    #         pixels[x,y] = (r, g, b)
 
 
     img.show()

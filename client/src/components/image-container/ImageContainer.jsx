@@ -1,14 +1,15 @@
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useEffect } from "react";
+import { connect } from "react-redux";
 import { Button } from "@material-ui/core";
 import { makeStyles } from "@material-ui/core/styles";
 import { useDispatch } from "react-redux";
-import { imageUpload } from "../../store/actions/imgAction";
+import { imageUpload, imageHistogram } from "../../store/actions/imgAction";
 import ImageUploader from "react-images-upload";
 import * as api from "../../functions/api.js";
 import Histogram from "react-chart-histogram";
 import { Row } from "react-bootstrap";
-import ImageGalleryContainer from "../image-gallery/ImageGalleryContainer"
-
+import ImageGalleryContainer from "../image-gallery/ImageGalleryContainer";
+import { scaleLinear, max, axisLeft, axisBottom, select } from "d3";
 
 import Sketch from "react-p5";
 
@@ -18,38 +19,53 @@ const useStyles = makeStyles({
   }
 });
 
-
-const ImageContainer = () => {
+const ImageContainer = histograms => {
   const dispatch = useDispatch();
   const [pictures, setPictures] = useState([]);
   var bin = [];
   var data = [];
   var isGraph = false;
-  var options = { fillColor: "#FFFFFF", strokeColor: "#0000FF", fontSize: "small"};
+  var options = {
+    fillColor: "#FFFFFF",
+    strokeColor: "#0000FF",
+    fontSize: "small"
+  };
   const pictureRef = useRef(null);
-  const [canvasSize, setCanvasSize] = useState([0, 0])
+  const [canvasSize, setCanvasSize] = useState([0, 0]);
 
-  const changeCanvasSize = (imageUrl) => {
+  useEffect(() => {
+    // Update the document title using the browser API
+    const test = histograms.histograms;
+    {
+      // console.log(histograms.length);
+    }
+  });
+
+  const changeCanvasSize = imageUrl => {
     var img = new Image();
-    img.onload = function () {
-      console.log(img.width + ' ' + img.height);
-      setCanvasSize([img.height, img.width])
+    img.onload = function() {
+      console.log(img.width + " " + img.height);
+      setCanvasSize([img.height, img.width]);
     };
 
-
     img.src = imageUrl;
-  }
+  };
 
   const onDrop = (pictureFiles, pictureDataURLs) => {
-    changeCanvasSize(pictureDataURLs)
+    changeCanvasSize(pictureDataURLs);
     setPictures(pictures.concat(pictureDataURLs));
     if (pictures.length > 1) {
       setPictures(pictures.pop());
     }
   };
 
+  const getHistogram = () => {
+    dispatch(imageHistogram(pictureRef.current.toDataURL()));
+    console.log(histograms);
+  };
+
   const uploadImages = () => {
-    dispatch(imageUpload(pictureRef.current.toDataURL()))
+    dispatch(imageUpload(pictureRef.current.toDataURL()));
   };
 
   const drawGraph = () => {
@@ -58,9 +74,12 @@ const ImageContainer = () => {
     bin = Array.from(Array(256).keys());
   };
 
+  var test = JSON.stringify(histograms);
+  var test2 = JSON.parse(test);
+
   return (
-    <div >
-    <p>
+    <div>
+      <p>
         Standard Deviation: <span id="standardDeviation" />
       </p>
       <p>
@@ -71,10 +90,15 @@ const ImageContainer = () => {
           display: "flex",
           justifyContent: "center",
           alignItems: "center",
-          marginTop: '1rem'
+          marginTop: "1rem"
         }}
       >
-        <canvas ref={pictureRef} className="canvas" height={canvasSize[0]} width={canvasSize[1]}></canvas>
+        <canvas
+          ref={pictureRef}
+          className="canvas"
+          height={canvasSize[0]}
+          width={canvasSize[1]}
+        ></canvas>
       </div>
       {pictures.length > 0 && Array.isArray(pictures) && (
         <div
@@ -94,7 +118,7 @@ const ImageContainer = () => {
                   key={i}
                   src={file}
                   onLoad={() => {
-                    api.blobToCanvas(file)
+                    api.blobToCanvas(file);
                   }}
                   alt="preview"
                 />
@@ -178,6 +202,7 @@ const ImageContainer = () => {
         </div>
       )}
       <Button onClick={uploadImages}>Submit</Button>
+      <Button onClick={getHistogram}>Histogram</Button>
       <ImageUploader
         withIcon={true}
         buttonText="Choose images"
@@ -185,11 +210,18 @@ const ImageContainer = () => {
         imgExtension={[".jpg", ".gif", ".png", ".gif", ".jpeg"]}
         maxFileSize={5242880}
         singleImage={true}
-      // withPreview={true}
+        // withPreview={true}
       />
       {/* <ImageGalleryContainer /> */}
+      {histograms.histograms}
     </div>
   );
 };
 
-export default ImageContainer;
+const mapStateToProps = state => {
+  return {
+    histograms: state.img.histograms
+  };
+};
+
+export default connect(mapStateToProps)(ImageContainer);

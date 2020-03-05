@@ -1,4 +1,12 @@
+class Piece {
+  constructor(mn, std) {
+    this.sd = std;
+    this.mean = mn;
+  }
+}
+
 var data;
+var meanAndStdOfPieces = [];
 
 const getData = () => {
   return data;
@@ -21,11 +29,53 @@ function blobToCanvas(blob) {
       ctx.drawImage(image, 0, 0, pctx.width, pctx.height);
       var imageData = ctx.getImageData(0, 0, pctx.width, pctx.height);
       data = imageData.data;
-      for (var i = 0; i < img.length; i++) {
-        var imgclear = img[i];
-        imgclear.style.display = "none";
-      }
+      // for (var i = 0; i < img.length; i++) {
+      //   var imgclear = img[i];
+      //   imgclear.style.display = "none";
+      // }
       // console.log(data);
+
+      function cutImageUp() {
+        var imagePieces = [];
+        var numColsToCut = 10;
+        var numRowsToCut = 10;
+        var widthOfOnePiece = pctx.width / numColsToCut;
+        var heightOfOnePiece = pctx.height / numRowsToCut;
+        for (var x = 0; x < numColsToCut; ++x) {
+          for (var y = 0; y < numRowsToCut; ++y) {
+            var canvas = document.createElement("canvas");
+            var pieceData;
+            canvas.width = widthOfOnePiece;
+            canvas.height = heightOfOnePiece;
+            var context = canvas.getContext("2d");
+            context.drawImage(
+              image,
+              x * widthOfOnePiece,
+              y * heightOfOnePiece,
+              widthOfOnePiece,
+              heightOfOnePiece,
+              0,
+              0,
+              canvas.width,
+              canvas.height
+            );
+            pieceData = context.getImageData(
+              0,
+              0,
+              widthOfOnePiece,
+              heightOfOnePiece
+            );
+            meanAndStdOfPieces.push(
+              new Piece(getMean(pieceData.data), getSD(pieceData.data))
+            );
+            imagePieces.push(canvas.toDataURL());
+          }
+        }
+        var imagePiecesFiltered = imagePieces.filter(function(x) {
+          return x !== undefined;
+        });
+        return imagePiecesFiltered;
+      }
 
       var getHistogram = () => {
         var histogram = document.createElement("Histogram");
@@ -44,8 +94,6 @@ function blobToCanvas(blob) {
         );
       };
 
-      mean.innerHTML = getMean(data);
-
       // Standard deviation
       let getSD = function(data) {
         let m = getMean(data);
@@ -57,7 +105,10 @@ function blobToCanvas(blob) {
         );
       };
 
+      mean.innerHTML = getMean(data);
       stdDev.innerHTML = getSD(data);
+
+      console.log(cutImageUp());
 
       //INVERT COLORS OF PICTURE
       var invert = function() {
@@ -125,7 +176,12 @@ function blobToCanvas(blob) {
           g = Math.sqrt(g / count);
           b = Math.sqrt(b / count);
           a = a / count;
-          return { r, g, b, a };
+          return {
+            r,
+            g,
+            b,
+            a
+          };
         });
       }
 
@@ -133,16 +189,16 @@ function blobToCanvas(blob) {
       var applyBrightness = function(data, brightness) {
         for (var i = 0; i < data.length; i += 4) {
           if (
-            data[i] != 255 ||
-            data[i] != 0 ||
-            data[i + 1] != 255 ||
-            data[i + 1] != 0 ||
-            data[i + 2] != 255 ||
-            data[i + 2] != 0
+            !(data[i] >= 255) ||
+            !(data[i] <= 0) ||
+            !(data[i + 1] >= 255) ||
+            !(data[i + 1] <= 0) ||
+            !(data[i + 2] >= 255) ||
+            !(data[i + 2] <= 0)
           ) {
-            data[i] = truncateColor((data[i] += brightness));
-            data[i + 1] = truncateColor((data[i + 1] += brightness));
-            data[i + 2] = truncateColor((data[i + 2] += brightness));
+            data[i] = data[i] += brightness;
+            data[i + 1] = data[i + 1] += brightness;
+            data[i + 2] = data[i + 2] += brightness;
           } else {
             console.log(data[i]);
             console.log(data[i + 1]);
@@ -186,66 +242,6 @@ function blobToCanvas(blob) {
         ctx.putImageData(imageData, 0, 0);
       };
 
-      var smooth = function sharpen(ctx, w, h, mix) {
-        var x,
-          sx,
-          sy,
-          r,
-          g,
-          b,
-          a,
-          dstOff,
-          srcOff,
-          wt,
-          cx,
-          cy,
-          scy,
-          scx,
-          weights = [0, -1, 0, -1, 5, -1, 0, -1, 0],
-          katet = Math.round(Math.sqrt(weights.length)),
-          half = (katet * 0.5) | 0,
-          dstData = ctx.createImageData(w, h),
-          dstBuff = dstData.data,
-          srcBuff = ctx.getImageData(0, 0, w, h).data,
-          y = h;
-
-        while (y--) {
-          x = w;
-          while (x--) {
-            sy = y;
-            sx = x;
-            dstOff = (y * w + x) * 4;
-            r = 0;
-            g = 0;
-            b = 0;
-            a = 0;
-
-            for (cy = 0; cy < katet; cy++) {
-              for (cx = 0; cx < katet; cx++) {
-                scy = sy + cy - half;
-                scx = sx + cx - half;
-
-                if (scy >= 0 && scy < h && scx >= 0 && scx < w) {
-                  srcOff = (scy * w + scx) * 4;
-                  wt = weights[cy * katet + cx];
-
-                  r += srcBuff[srcOff] * wt;
-                  g += srcBuff[srcOff + 1] * wt;
-                  b += srcBuff[srcOff + 2] * wt;
-                  a += srcBuff[srcOff + 3] * wt;
-                }
-              }
-            }
-
-            dstBuff[dstOff] = r * mix + srcBuff[dstOff] * (1 - mix);
-            dstBuff[dstOff + 1] = g * mix + srcBuff[dstOff + 1] * (1 - mix);
-            dstBuff[dstOff + 2] = b * mix + srcBuff[dstOff + 2] * (1 - mix);
-            dstBuff[dstOff + 3] = srcBuff[dstOff + 3];
-          }
-        }
-        ctx.putImageData(dstData, 0, 0);
-      };
-
       //CONTRAST SLIDER
       var contrastSlider = document.getElementById("contrastRange");
       var contrastOutput = document.getElementById("contrastOutput");
@@ -278,12 +274,12 @@ function blobToCanvas(blob) {
           if (this.value > oldBrightnessvalue) {
             console.log("up");
             brightnessOutput.innerHTML = this.value;
-            applyBrightness(imageData.data, 1);
+            applyBrightness(imageData.data, this.value - oldBrightnessvalue);
             oldBrightnessvalue = this.value;
           } else if (this.value < oldBrightnessvalue) {
             console.log("down");
             brightnessOutput.innerHTML = this.value;
-            applyBrightness(imageData.data, -1);
+            applyBrightness(imageData.data, this.value - oldBrightnessvalue);
             oldBrightnessvalue = this.value;
           } else {
             console.log("yeet");
@@ -293,12 +289,12 @@ function blobToCanvas(blob) {
           if (this.value < oldBrightnessvalue) {
             console.log("up");
             brightnessOutput.innerHTML = this.value;
-            applyBrightness(imageData.data, 1);
+            applyBrightness(imageData.data, this.value - oldBrightnessvalue);
             oldBrightnessvalue = this.value;
           } else if (this.value > oldBrightnessvalue) {
             console.log("down");
             brightnessOutput.innerHTML = this.value;
-            applyBrightness(imageData.data, -1);
+            applyBrightness(imageData.data, this.value - oldBrightnessvalue);
             oldBrightnessvalue = this.value;
           } else {
             console.log("yeet");
@@ -316,10 +312,6 @@ function blobToCanvas(blob) {
       grayscalebtn.addEventListener("click", grayscale);
       var blurringbtn = document.getElementById("blurringbtn");
       blurringbtn.addEventListener("click", blurring);
-
-      //SMOOTH BUTTON
-      // var smoothbtn = document.getElementById("smoothbtn");
-      // smoothbtn.addEventListener("click", smooth(ctx, 10, 10, 0.9));
     };
   }
 }

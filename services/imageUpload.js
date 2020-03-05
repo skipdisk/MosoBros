@@ -21,7 +21,9 @@ var storage = multer.diskStorage({
     }
 });
 
-const imageUpload = multer({ storage: storage });
+const imageUpload = multer({
+    storage: storage
+});
 
 console.log(imageUpload)
 

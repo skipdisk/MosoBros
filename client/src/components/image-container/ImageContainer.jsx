@@ -21,6 +21,8 @@ const useStyles = makeStyles({
 const ImageContainer = histograms => {
   const dispatch = useDispatch()
   const [pictures, setPictures] = useState([])
+  const [histogram, setHistogram] = useState([])
+
   var bin = []
   var data = []
   var isGraph = false
@@ -33,11 +35,7 @@ const ImageContainer = histograms => {
   const [canvasSize, setCanvasSize] = useState([0, 0])
 
   useEffect(() => {
-    // Update the document title using the browser API
-    const test = histograms.histograms
-    {
-      console.log(histograms.length)
-    }
+    console.log(histograms.histograms.length)
   })
 
   const changeCanvasSize = imageUrl => {
@@ -58,8 +56,11 @@ const ImageContainer = histograms => {
     }
   }
 
-  const getHistogram = () => {
-    dispatch(imageHistogram(pictureRef.current.toDataURL()))
+  const getHistogram = async () => {
+    const histogram = await dispatch(
+      imageHistogram(pictureRef.current.toDataURL())
+    )
+    setHistogram(histogram)
   }
 
   const uploadImages = () => {
@@ -72,6 +73,7 @@ const ImageContainer = histograms => {
     bin = Array.from(Array(256).keys())
   }
 
+  console.log(histogram)
   return (
     <div>
       <p>
@@ -208,7 +210,6 @@ const ImageContainer = histograms => {
         // withPreview={true}
       />
       {/* <ImageGalleryContainer /> */}
-      {histograms.histograms}
     </div>
   )
 }

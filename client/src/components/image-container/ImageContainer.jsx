@@ -22,6 +22,8 @@ const ImageContainer = histograms => {
   const dispatch = useDispatch()
   const [pictures, setPictures] = useState([])
   const [histogram, setHistogram] = useState([])
+  const [blurringValues, setBlurringValues] = useState([1, 2, 3, 4, 5, 6, 7, 8, 9])
+
 
   var bin = []
   var data = []
@@ -132,7 +134,7 @@ const ImageContainer = histograms => {
               <input id='smoothbtn' value='Smooth' type='button' />
               <input id='grayscalebtn' value='Grayscale' type='button' />
               <input id='invertbtn' value='Invert' type='button' />
-              <input id='blurringbtn' value='Blurring' type='button' />
+              <button id='blurringbtn' name='Blurring' value={blurringValues} type='button'>Blurring</button>
             </div>
             <div
               style={{
@@ -207,9 +209,9 @@ const ImageContainer = histograms => {
         imgExtension={['.jpg', '.gif', '.png', '.gif', '.jpeg']}
         maxFileSize={5242880}
         singleImage={true}
-        // withPreview={true}
+      // withPreview={true}
       />
-      {/* <ImageGalleryContainer /> */}
+      <ImageGalleryContainer />
     </div>
   )
 }

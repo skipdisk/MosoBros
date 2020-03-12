@@ -91,18 +91,21 @@ function blobToCanvas(blob) {
 
           var channels = callback(r, g, b, a, imageData.data, i);
 
+
           imageData.data[i] = channels.r;
           imageData.data[i + 1] = channels.g;
           imageData.data[i + 2] = channels.b;
           imageData.data[i + 3] = channels.a;
-          //
         }
+
 
         ctx.putImageData(imageData, 0, 0);
       }
 
       //Uses the gaussian blur on the pictures on a 3x3 area
-      function blurring() {
+      function blurring(e) {
+        const inputEdgeArray = e.target.value.split(',')
+
         const w = pctx.width * 4;
         // the offset index for each pixel excluding the center pixel
         const grid = [-w - 4, -w, -w + 4, -4, 4, w - 4, w, w + 4];
@@ -116,17 +119,19 @@ function blobToCanvas(blob) {
           for (idx = 0; idx < grid.length; idx++) {
             const off = grid[idx];
             if (i + off >= 0 && i + off < w * pctx.height) {
-              r += dat[i + off] * dat[i + off];
+              r += dat[i + off] * dat[i + off] * 2;
               g += dat[i + 1 + off] * dat[i + 1 + off];
               b += dat[i + 2 + off] * dat[i + 2 + off];
               a += dat[i + 3 + off];
               count++;
             }
+            console.log(dat[i + 1 + off])
           }
           r = Math.sqrt(r / count);
           g = Math.sqrt(g / count);
           b = Math.sqrt(b / count);
           a = a / count;
+
           return {
             r,
             g,
@@ -248,8 +253,8 @@ function blobToCanvas(blob) {
         contrastSlider.value = this.value;
         oldContrastvalue =
           this.value > oldContrastvalue ?
-          parseInt(this.value) - 1 :
-          parseInt(this.value) + 1;
+            parseInt(this.value) - 1 :
+            parseInt(this.value) + 1;
         // console.log(oldContrastvalue);
         contrastOutput.innerHTML = this.value;
         // ctx.drawImage(image, 0, 0, pctx.width, pctx.height);

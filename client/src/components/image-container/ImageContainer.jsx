@@ -7,9 +7,8 @@ import { imageUpload, imageHistogram } from "../../store/actions/imgAction";
 import ImageUploader from "react-images-upload";
 import * as api from "../../functions/api.js";
 import Histogram from "react-chart-histogram";
-import { Row } from "react-bootstrap";
-import ImageGalleryContainer from "../image-gallery/ImageGalleryContainer";
-import { scaleLinear, max, axisLeft, axisBottom, select } from "d3";
+import Slider from "@material-ui/core/Slider";
+import ImageHistogram from './ImageHistogram';
 
 import Sketch from "react-p5";
 
@@ -19,19 +18,25 @@ const useStyles = makeStyles({
   }
 });
 
+function usePrevious(value) {
+  const ref = useRef();
+  useEffect(() => {
+    ref.current = value;
+  });
+  return ref.current;
+}
+
+
 const ImageContainer = histograms => {
   const dispatch = useDispatch();
   const [pictures, setPictures] = useState([]);
-  var bin = [];
-  var data = [];
-  var isGraph = false;
-  var options = {
-    fillColor: "#FFFFFF",
-    strokeColor: "#0000FF",
-    fontSize: "small"
-  };
-  const pictureRef = useRef(null);
+  const [pixelData, setPixelData] = useState([]);
   const [canvasSize, setCanvasSize] = useState([0, 0]);
+  const [brightnessValue, setBrightnessValue] = useState(50);
+  const pictureRef = useRef(null);
+  const prevBrightness = usePrevious(brightnessValue);
+
+  // const bin = [...Array(19).keys()];
 
   useEffect(() => {
     // Update the document title using the browser API
@@ -60,149 +65,112 @@ const ImageContainer = histograms => {
   };
 
   const getHistogram = () => {
-    dispatch(imageHistogram(pictureRef.current.toDataURL()));
-    console.log(histograms);
+    // dispatch(imageHistogram(pictureRef.current.toDataURL()));
+    console.log(pictureRef);
   };
 
   const uploadImages = () => {
     dispatch(imageUpload(pictureRef.current.toDataURL()));
   };
 
-  const drawGraph = () => {
-    isGraph = true;
-    data = api.getData();
-    bin = Array.from(Array(256).keys());
+  const invert = () => {
+    const canvas = pictureRef.current;
+    const ctx = canvas.getContext("2d");
+    let myImageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+
+    for (var i = 0; i < myImageData.data.length; i += 4) {
+      myImageData.data[i] = 255 - myImageData.data[i]; // red
+      myImageData.data[i + 1] = 255 - myImageData.data[i + 1]; // green
+      myImageData.data[i + 2] = 255 - myImageData.data[i + 2]; // blue
+    }
+    ctx.putImageData(myImageData, 0, 0);
   };
 
-  var test = JSON.stringify(histograms);
-  var test2 = JSON.parse(test);
+  const handleBrightnessChange = () => {
+    const canvas = pictureRef.current;
+    const ctx = canvas.getContext("2d");
+    let myImageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+    let brightnessToAdd = brightnessValue > prevBrightness ? 1 : -1;
+    console.log(brightnessValue);
+
+    for (var i = 0; i < myImageData.data.length; i += 4) {
+      myImageData.data[i] += brightnessToAdd; // red
+      myImageData.data[i + 1] += brightnessToAdd; // green
+      myImageData.data[i + 2] += brightnessToAdd; // blue
+    }
+    ctx.putImageData(myImageData, 0, 0);
+    setBrightnessValue(brightnessValue + brightnessToAdd);
+  };
+
+  const greyscale = () => {
+    const canvas = pictureRef.current;
+    const ctx = canvas.getContext("2d");
+    let myImageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+
+    for (var i = 0; i < myImageData.data.length; i += 4) {
+      let avg =
+        (myImageData.data[i] +
+          myImageData.data[i + 1] +
+          myImageData.data[i + 2]) /
+        3;
+      myImageData.data[i] = avg; // red
+      myImageData.data[i + 1] = avg; // green
+      myImageData.data[i + 2] = avg; // blue
+    }
+    ctx.putImageData(myImageData, 0, 0);
+  };
+
+  const imageToCanvas = file => {
+    const image = new Image();
+    let newBlob = file;
+    image.src = newBlob;
+    const canvas = pictureRef.current;
+    const ctx = canvas.getContext("2d");
+    ctx.drawImage(image, 0, 0, canvas.width, canvas.height);
+    var myImageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+
+    setPixelData(myImageData.data);
+  };
 
   return (
     <div>
-      <p>
-        Standard Deviation: <span id="standardDeviation" />
-      </p>
-      <p>
-        Mean: <span id="mean" />
-      </p>
-      <div
-        style={{
-          display: "flex",
-          justifyContent: "center",
-          alignItems: "center",
-          marginTop: "1rem"
+      <canvas
+        ref={pictureRef}
+        width={canvasSize[1]}
+        height={canvasSize[0]}
+        onClick={e => {
+          const canvas = pictureRef.current;
+          const ctx = canvas.getContext("2d");
+          // implement draw on ctx here
         }}
-      >
-        <canvas
-          ref={pictureRef}
-          className="canvas"
-          height={canvasSize[0]}
-          width={canvasSize[1]}
-        ></canvas>
-      </div>
-      {pictures.length > 0 && Array.isArray(pictures) && (
-        <div
-          style={{
-            display: "flex",
-            justifyContent: "center",
-            alignItems: "center"
-          }}
-        >
-          <ul style={{ listStyleType: "none", padding: 0 }}>
-            {pictures.map((file, i) => (
-              <li key={i}>
-                <img
-                  className="img"
-                  height={canvasSize[0]}
-                  width={canvasSize[1]}
-                  key={i}
-                  src={file}
-                  onLoad={() => {
-                    api.blobToCanvas(file);
-                  }}
-                  alt="preview"
-                />
-                <p>{file.name}</p>
-              </li>
-            ))}
-            <div
-              style={{
-                display: "flex",
-                justifyContent: "center",
-                alignItems: "center"
-              }}
-            >
-              <input id="smoothbtn" value="Smooth" type="button" />
-              <input id="grayscalebtn" value="Grayscale" type="button" />
-              <input id="invertbtn" value="Invert" type="button" />
-              <input id="blurringbtn" value="Blurring" type="button" />
-            </div>
-            <div
-              style={{
-                display: "flex",
-                justifyContent: "space-between",
-                alignItems: "center"
-              }}
-            >
-              <p>Brightness</p>
-              <p>Contrast</p>
-            </div>
-            <div
-              style={{
-                display: "flex",
-                justifyContent: "space-between",
-                alignItems: "center"
-              }}
-            >
-              <input
-                type="range"
-                id="brightnessRange"
-                min="-100"
-                max="100"
-                step="1"
-                value="0"
-              />
-
-              <input
-                type="range"
-                id="contrastRange"
-                min="-100"
-                max="100"
-                step="1"
-                value="0"
-              />
-            </div>
-            <div
-              style={{
-                display: "flex",
-                justifyContent: "space-between",
-                alignItems: "center"
-              }}
-            >
-              <p>
-                Value: <span id="brightnessOutput" />
-              </p>
-              <p>
-                Value: <span id="contrastOutput" />
-              </p>
-            </div>
-            <Button onClick={drawGraph}>Graph</Button>
-          </ul>
-        </div>
-      )}
-      {isGraph && (
-        <div>
-          <Histogram
-            xLabels={bin}
-            yValues={data}
-            height="200"
-            width="800"
-            options={options}
+      />
+      {pictures.map((file, i) => (
+        <li key={i}>
+          <img
+            className="img"
+            height={canvasSize[0]}
+            width={canvasSize[1]}
+            key={i}
+            src={file}
+            onLoad={() => {
+              imageToCanvas(file);
+            }}
+            alt="preview"
           />
-        </div>
-      )}
+          <p>{file.name}</p>
+        </li>
+      ))}
       <Button onClick={uploadImages}>Submit</Button>
       <Button onClick={getHistogram}>Histogram</Button>
+      <Button onClick={invert}>Invert</Button>
+      <Button onClick={greyscale}>Grey Scale</Button>
+      <Slider
+        value={brightnessValue}
+        onChange={handleBrightnessChange}
+        min={0}
+        step={1}
+        max={100}
+      />
       <ImageUploader
         withIcon={true}
         buttonText="Choose images"
@@ -212,8 +180,7 @@ const ImageContainer = histograms => {
         singleImage={true}
         // withPreview={true}
       />
-      {/* <ImageGalleryContainer /> */}
-      {histograms.histograms}
+      <ImageHistogram/>
     </div>
   );
 };

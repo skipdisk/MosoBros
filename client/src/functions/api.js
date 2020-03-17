@@ -26,7 +26,7 @@ function blobToCanvas(blob) {
     var ctx = pctx.getContext("2d");
     image.src = newBlob;
     image.onload = function() {
-      ctx.drawImage(image, 0, 0, pctx.width, pctx.height);
+      ctx.drawImage(image, 0, 0, pctx.wiwdth, pctx.height);
       var imageData = ctx.getImageData(0, 0, pctx.width, pctx.height);
       data = imageData.data;
       // for (var i = 0; i < img.length; i++) {
@@ -120,6 +120,26 @@ function blobToCanvas(blob) {
         ctx.putImageData(imageData, 0, 0);
       };
 
+      //NORMALIZE IMAGE
+      var normalize = function() {
+        var imin = 255;
+        var imax = 1;
+
+        for (var i = 0; i < data.length; i++) {
+          imin = Math.min(i, imin);
+          imax = Math.max(i, imax);
+        }
+
+        for (var i = 0; i < data.length; i += 4) {
+          var val = (data[i] + data[i + 1] + data[i + 2]) / 3;
+          var ip = 255 * (val - imin) / (imax - imin);
+          data[i] = (data[i] * ip) / (i || 1);
+          data[i + 1] = (data[i + 1] * ip) / (i || 1);
+          data[i + 2] = (data[i + 2] * ip) / (i || 1);
+        }
+        ctx.putImageData(imageData, 0, 0);
+      };
+
       //GRAYSCALE COLORS OF PICTURE
       var grayscale = function() {
         for (var i = 0; i < data.length; i += 4) {
@@ -183,6 +203,8 @@ function blobToCanvas(blob) {
             a
           };
         });
+
+        return 'hahahaha'
       }
 
       //BRIGHTNESS OF PICTURE
@@ -312,6 +334,8 @@ function blobToCanvas(blob) {
       grayscalebtn.addEventListener("click", grayscale);
       var blurringbtn = document.getElementById("blurringbtn");
       blurringbtn.addEventListener("click", blurring);
+      var normalizebtn = document.getElementById("normalizebtn");
+      // normalizebtn.addEventListener("click", normalize);
     };
   }
 }

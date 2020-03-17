@@ -1,5 +1,3 @@
-
-
 const passport = require('passport');
 
 module.exports = app => {
@@ -13,7 +11,7 @@ module.exports = app => {
     app.get('/auth/google/callback',
         passport.authenticate('google'),
         (req, res) => {
-            res.redirect('/surveys');
+            res.redirect('/dashboard');
         }
     );
 };

@@ -81,6 +81,7 @@ const ImageContainer = histograms => {
       myImageData.data[i + 1] = 255 - myImageData.data[i + 1] // green
       myImageData.data[i + 2] = 255 - myImageData.data[i + 2] // blue
     }
+    setPixelData(myImageData.data)
     ctx.putImageData(myImageData, 0, 0)
   }
 
@@ -114,6 +115,7 @@ const ImageContainer = histograms => {
       myImageData.data[i + 1] = avg // green
       myImageData.data[i + 2] = avg // blue
     }
+    setPixelData(myImageData.data)
     ctx.putImageData(myImageData, 0, 0)
   }
 

@@ -14,7 +14,7 @@ import Payments from '../payment/Payments'
 const useStyles = makeStyles(theme => ({
   root: {
     flexGrow: 1,
-    marginLeft: 200
+    marginLeft: 150
   },
   menuButton: {
     marginRight: theme.spacing(2)

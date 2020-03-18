@@ -10,16 +10,17 @@ import Grid from '@material-ui/core/Grid'
 import Drawer from '@material-ui/core/Drawer'
 import { makeStyles } from '@material-ui/core/styles'
 import DoubleArrowIcon from '@material-ui/icons/DoubleArrow'
-
+import Header from '../layout/Header'
 import ImageHistogram from '../image-histogram/ImageHistogram'
 import ImageScatterPlot from '../image-scatterplot/ImageScatterPlot'
+import UndoIcon from '@material-ui/icons/Replay'
 
 const useStyles = makeStyles({
   root: {
     flexGrow: 1
   },
   pictureContainer: {
-    margin: '1rem'
+    marginTop: '1rem'
   },
   histogram: {
     margin: '2rem'
@@ -31,12 +32,19 @@ const useStyles = makeStyles({
     height: '100%'
   },
   drawer: {
-    width: 200,
+    width: 150,
     flexGrow: 1
     // flexShrink: 0
   },
   drawerPaper: {
-    width: 200
+    width: 150
+  },
+  arrowIcon: {
+    margin: 20
+  },
+  undoIcon: {
+    color: 'red',
+    margin: 20
   }
 })
 
@@ -45,6 +53,7 @@ const ImageContainer = histograms => {
   const classes = useStyles()
   const [pictures, setPictures] = useState([])
   const [pixelData, setPixelData] = useState([])
+  const [pixelDataArray, setPixelDataArray] = useState([])
   const [canvasSize, setCanvasSize] = useState([0, 0])
   const [originalImage, setOriginalImage] = useState([])
   const [originalCanvas, setOriginalCanvas] = useState([])
@@ -152,6 +161,7 @@ const ImageContainer = histograms => {
       myImageData.data[i + 2] = 255 - myImageData.data[i + 2] // blue
     }
     setPixelData(myImageData.data)
+    setPixelDataArray([...pixelDataArray, myImageData])
     ctx.putImageData(myImageData, 0, 0)
   }
 
@@ -221,6 +231,7 @@ const ImageContainer = histograms => {
       myImageData.data[i + 2] = avg // blue
     }
     setPixelData(myImageData.data)
+    setPixelDataArray([...pixelDataArray, myImageData])
     ctx.putImageData(myImageData, 0, 0)
   }
 
@@ -236,10 +247,23 @@ const ImageContainer = histograms => {
     setOriginalImage(image)
     setOriginalCanvas(canvas)
     setPixelData(myImageData.data)
+    setPixelDataArray([myImageData])
+  }
+
+  const Undo = () => {
+    const canvas = pictureRef.current
+    const ctx = canvas.getContext('2d')
+    //replaces pixel array to the previous iteration with the latest changes popped
+    let newPixelArray =
+      pixelDataArray.length > 1 ? pixelDataArray.slice(0, -1) : pixelDataArray
+    setPixelDataArray(newPixelArray)
+    setPixelData(newPixelArray[newPixelArray.length - 1].data)
+    ctx.putImageData(newPixelArray[newPixelArray.length - 1], 0, 0)
   }
 
   return (
     <div>
+      {pictures.length ? <Header /> : null}
       <Grid
         className={classes.pictureContainer}
         container
@@ -314,8 +338,18 @@ const ImageContainer = histograms => {
                   </Fragment>
                 ))}
               </Grid>
-              <Grid xs={2}>
-                <DoubleArrowIcon fontSize='large' />
+              <Grid
+                container
+                direction='column'
+                justify='center'
+                alignItems='center'
+                xs={2}
+              >
+                <UndoIcon className={classes.undoIcon} fontSize='large' />
+                <DoubleArrowIcon
+                  className={classes.arrowIcon}
+                  fontSize='large'
+                />
               </Grid>
               <Grid xs={5}>
                 <canvas

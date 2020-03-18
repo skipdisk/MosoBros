@@ -108,6 +108,7 @@ const ImageContainer = histograms => {
     }
 
     setPixelData(myImageData.data)
+    setPixelDataArray([...pixelDataArray, myImageData])
     ctx.putImageData(myImageData, 0, 0)
   }
 
@@ -211,6 +212,7 @@ const ImageContainer = histograms => {
       )
     }
     setPixelData(myImageData.data)
+    setPixelDataArray([...pixelDataArray, myImageData])
     ctx.putImageData(myImageData, 0, 0)
     setContrastValue(newValue)
   }
@@ -250,7 +252,7 @@ const ImageContainer = histograms => {
     setPixelDataArray([myImageData])
   }
 
-  const Undo = () => {
+  const undo = () => {
     const canvas = pictureRef.current
     const ctx = canvas.getContext('2d')
     //replaces pixel array to the previous iteration with the latest changes popped
@@ -345,7 +347,11 @@ const ImageContainer = histograms => {
                 alignItems='center'
                 xs={2}
               >
-                <UndoIcon className={classes.undoIcon} fontSize='large' />
+                <UndoIcon
+                  onClick={undo}
+                  className={classes.undoIcon}
+                  fontSize='large'
+                />
                 <DoubleArrowIcon
                   className={classes.arrowIcon}
                   fontSize='large'

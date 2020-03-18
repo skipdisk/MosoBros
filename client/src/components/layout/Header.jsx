@@ -13,7 +13,8 @@ import Payments from '../payment/Payments'
 
 const useStyles = makeStyles(theme => ({
   root: {
-    flexGrow: 1
+    flexGrow: 1,
+    marginLeft: 200
   },
   menuButton: {
     marginRight: theme.spacing(2)
@@ -29,6 +30,10 @@ const useStyles = makeStyles(theme => ({
   brand: {
     textDecoration: 'none',
     color: 'white'
+  },
+  navBar: {
+    background:
+      'linear-gradient(90deg, rgba(67,121,221,1) 26%, rgba(141,159,231,1) 61%, rgba(248,214,246,1) 100%)'
   }
 }))
 
@@ -63,7 +68,7 @@ const Header = ({ auth }) => {
   }
   return (
     <div className={classes.root}>
-      <AppBar position='static'>
+      <AppBar className={classes.navBar} position='static'>
         <Toolbar>
           <IconButton
             edge='start'

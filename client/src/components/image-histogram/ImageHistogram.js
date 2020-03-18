@@ -82,7 +82,7 @@ const MyChart = ({ imageData }) => {
         height: '300px'
       }}
     >
-      <Button onClick={updateData}>Histogram</Button>
+      <Button onClick={updateData}>Run</Button>
       <Chart data={histogramData} axes={axes} tooltip />
     </div>
   )

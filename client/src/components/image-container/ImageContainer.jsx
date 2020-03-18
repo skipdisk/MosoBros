@@ -1,39 +1,39 @@
-import React, { useState, useRef, useEffect } from 'react'
+import React, { useState, useRef, useEffect, Fragment } from 'react'
 import { connect } from 'react-redux'
 import { Button } from '@material-ui/core'
-import { makeStyles } from '@material-ui/core/styles'
 import { useDispatch } from 'react-redux'
 import { imageUpload, imageHistogram } from '../../store/actions/imgAction'
 import ImageUploader from 'react-images-upload'
 import * as api from '../../functions/api.js'
-import Histogram from 'react-chart-histogram'
 import Slider from '@material-ui/core/Slider'
+import Grid from '@material-ui/core/Grid'
+import { makeStyles } from '@material-ui/core/styles'
+import DoubleArrowIcon from '@material-ui/icons/DoubleArrow'
 
 import ImageHistogram from '../image-histogram/ImageHistogram'
-import Sketch from 'react-p5'
 
 const useStyles = makeStyles({
   root: {
     flexGrow: 1
+  },
+  pictureContainer: {
+    margin: '1rem'
+  },
+  histogram: {
+    margin: '2rem',
+    marginRight: '30px'
   }
 })
 
-function usePrevious (value) {
-  const ref = useRef()
-  useEffect(() => {
-    ref.current = value
-  })
-  return ref.current
-}
-
 const ImageContainer = histograms => {
   const dispatch = useDispatch()
+  const classes = useStyles()
   const [pictures, setPictures] = useState([])
   const [pixelData, setPixelData] = useState([])
   const [canvasSize, setCanvasSize] = useState([0, 0])
   const [brightnessValue, setBrightnessValue] = useState(50)
+  const [contrastValue, setContrastValue] = useState(0)
   const pictureRef = useRef(null)
-  const prevBrightness = usePrevious(brightnessValue)
 
   const changeCanvasSize = imageUrl => {
     var img = new Image()
@@ -51,11 +51,6 @@ const ImageContainer = histograms => {
     if (pictures.length > 1) {
       setPictures(pictures.pop())
     }
-  }
-
-  const getHistogram = () => {
-    // dispatch(imageHistogram(pictureRef.current.toDataURL()));
-    console.log(pictureRef)
   }
 
   const uploadImages = () => {
@@ -82,6 +77,7 @@ const ImageContainer = histograms => {
       //
     }
 
+    setPixelData(myImageData.data)
     ctx.putImageData(myImageData, 0, 0)
   }
 
@@ -138,19 +134,54 @@ const ImageContainer = histograms => {
     ctx.putImageData(myImageData, 0, 0)
   }
 
-  const handleBrightnessChange = () => {
+  const handleBrightnessChange = (event, newValue) => {
     const canvas = pictureRef.current
     const ctx = canvas.getContext('2d')
     let myImageData = ctx.getImageData(0, 0, canvas.width, canvas.height)
-    let brightnessToAdd = brightnessValue > prevBrightness ? 1 : -1
+    // let brightnessToAdd = brightnessValue > newValue ? -1 : 1
+    let brightnessToAdd = newValue - brightnessValue
 
     for (var i = 0; i < myImageData.data.length; i += 4) {
       myImageData.data[i] += brightnessToAdd // red
       myImageData.data[i + 1] += brightnessToAdd // green
       myImageData.data[i + 2] += brightnessToAdd // blue
     }
+
+    setPixelData(myImageData.data)
     ctx.putImageData(myImageData, 0, 0)
-    setBrightnessValue(brightnessValue + brightnessToAdd)
+    setBrightnessValue(newValue)
+  }
+
+  function truncateColor (value) {
+    if (value < 0) {
+      value = 0
+    } else if (value > 255) {
+      value = 255
+    }
+
+    return value
+  }
+  const handleContrastChange = (event, newValue) => {
+    const canvas = pictureRef.current
+    const ctx = canvas.getContext('2d')
+    let myImageData = ctx.getImageData(0, 0, canvas.width, canvas.height)
+
+    var factor = (259.0 * (newValue + 255.0)) / (255.0 * (259.0 - newValue))
+
+    for (var i = 0; i < myImageData.data.length; i += 4) {
+      myImageData.data[i] = truncateColor(
+        factor * (myImageData.data[i] - 128.0) + 128.0
+      )
+      myImageData.data[i + 1] = truncateColor(
+        factor * (myImageData.data[i + 1] - 128.0) + 128.0
+      )
+      myImageData.data[i + 2] = truncateColor(
+        factor * (myImageData.data[i + 2] - 128.0) + 128.0
+      )
+    }
+    setPixelData(myImageData.data)
+    ctx.putImageData(myImageData, 0, 0)
+    setContrastValue(newValue)
   }
 
   const greyscale = () => {
@@ -186,72 +217,80 @@ const ImageContainer = histograms => {
 
   return (
     <div>
-      <div
-        style={{
-          display: 'flex',
-          flexDirection: 'column',
-          alignItems: 'center',
-          justifyContent: 'center'
-        }}
+      <Grid
+        className={classes.pictureContainer}
+        container
+        justify='space-between'
+        alignItems='center'
       >
-        <canvas ref={pictureRef} width={canvasSize[1]} height={canvasSize[0]} />
-        {pictures.map((file, i) => (
-          <div>
-            <img
-              className='img'
-              height={canvasSize[0]}
-              width={canvasSize[1]}
-              key={i}
-              src={file}
-              onLoad={() => {
-                imageToCanvas(file)
-              }}
-              alt='preview'
-            />
-            <p>{file.name}</p>
-          </div>
-        ))}
-      </div>
-      <Button onClick={uploadImages}>Submit</Button>
-      <Button onClick={invert}>Invert</Button>
-      <Button onClick={greyscale}>Grey Scale</Button>
-      <Button onClick={blurring}>Blurring</Button>
-
-      <Slider
-        value={brightnessValue}
-        onChange={handleBrightnessChange}
-        min={0}
-        step={1}
-        max={100}
-      />
-      <ImageUploader
-        withIcon={true}
-        buttonText='Choose images'
-        onChange={onDrop}
-        imgExtension={['.jpg', '.gif', '.png', '.gif', '.jpeg']}
-        maxFileSize={5242880}
-        singleImage={true}
-        // withPreview={true}
-      />
-      <div
-        style={{
-          display: 'flex',
-          flexDirection: 'column',
-          alignItems: 'center',
-          justifyContent: 'center',
-          marginBottom: '10vh'
-        }}
-      >
-        <ImageHistogram imageData={pixelData} />
-      </div>
+        {pictures.length ? (
+          <Fragment>
+            <Grid xs={2}>
+              <Button onClick={invert}>Invert</Button>
+              <Button onClick={greyscale}>Grey Scale</Button>
+              <Button onClick={blurring}>Blurring</Button>
+              <Slider
+                value={brightnessValue}
+                onChangeCommitted={handleBrightnessChange}
+                min={0}
+                step={1}
+                max={100}
+              />
+              <Slider
+                value={contrastValue}
+                onChangeCommitted={handleContrastChange}
+                min={-50}
+                step={1}
+                max={50}
+              />
+            </Grid>
+            <Grid xs={10} container justify='center' alignItems='center'>
+              <Grid xs={5}>
+                {pictures.map((file, i) => (
+                  <Fragment>
+                    <img
+                      className='img'
+                      height={canvasSize[0]}
+                      width={canvasSize[1]}
+                      key={i}
+                      src={file}
+                      onLoad={() => {
+                        imageToCanvas(file)
+                      }}
+                      alt='preview'
+                    />
+                  </Fragment>
+                ))}
+              </Grid>
+              <Grid xs={2}>
+                <DoubleArrowIcon fontSize='large' />
+              </Grid>
+              <Grid xs={5}>
+                <canvas
+                  ref={pictureRef}
+                  width={canvasSize[1]}
+                  height={canvasSize[0]}
+                />
+              </Grid>
+              <Grid className={classes.histogram} xs={12}>
+                <ImageHistogram imageData={pixelData} />
+              </Grid>
+            </Grid>
+          </Fragment>
+        ) : (
+          <ImageUploader
+            withIcon={true}
+            buttonText='Choose images'
+            onChange={onDrop}
+            imgExtension={['.jpg', '.gif', '.png', '.gif', '.jpeg']}
+            maxFileSize={5242880}
+            singleImage={true}
+            // withPreview={true}
+          />
+        )}
+      </Grid>
     </div>
   )
 }
 
-const mapStateToProps = state => {
-  return {
-    histograms: state.img.histograms
-  }
-}
-
-export default connect(mapStateToProps)(ImageContainer)
+export default connect(null)(ImageContainer)

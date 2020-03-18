@@ -22,7 +22,7 @@ const MyChart = ({ imageData }) => {
     const redData = {}
     const greenData = {}
     const blueData = {}
-    for (var i = 0; i < 1000; i += 4) {
+    for (var i = 0; i < imageData.length; i += 4) {
       const redPixel = imageData[i] // red
       const greenPixel = imageData[i + 1] // green
       const bluePixel = imageData[i + 2] // blue
@@ -78,7 +78,7 @@ const MyChart = ({ imageData }) => {
   return (
     <div
       style={{
-        width: '70vw',
+        width: '75vw',
         height: '300px'
       }}
     >

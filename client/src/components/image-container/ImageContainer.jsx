@@ -133,32 +133,32 @@ const ImageContainer = histograms => {
 
   return (
     <div>
-      <canvas
-        ref={pictureRef}
-        width={canvasSize[1]}
-        height={canvasSize[0]}
-        onClick={e => {
-          const canvas = pictureRef.current
-          const ctx = canvas.getContext('2d')
-          // implement draw on ctx here
+      <div
+        style={{
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          justifyContent: 'center'
         }}
-      />
-      {pictures.map((file, i) => (
-        <li key={i}>
-          <img
-            className='img'
-            height={canvasSize[0]}
-            width={canvasSize[1]}
-            key={i}
-            src={file}
-            onLoad={() => {
-              imageToCanvas(file)
-            }}
-            alt='preview'
-          />
-          <p>{file.name}</p>
-        </li>
-      ))}
+      >
+        <canvas ref={pictureRef} width={canvasSize[1]} height={canvasSize[0]} />
+        {pictures.map((file, i) => (
+          <div>
+            <img
+              className='img'
+              height={canvasSize[0]}
+              width={canvasSize[1]}
+              key={i}
+              src={file}
+              onLoad={() => {
+                imageToCanvas(file)
+              }}
+              alt='preview'
+            />
+            <p>{file.name}</p>
+          </div>
+        ))}
+      </div>
       <Button onClick={uploadImages}>Submit</Button>
       <Button onClick={invert}>Invert</Button>
       <Button onClick={greyscale}>Grey Scale</Button>

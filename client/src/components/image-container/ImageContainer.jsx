@@ -221,7 +221,7 @@ const ImageContainer = ({ auth }) => {
               justify='center'
               alignItems='center'
             >
-              <Grid xs={5}>
+              <Grid xs={12}>
                 {pictures.map((file, i) => (
                   <Fragment>
                     <img
@@ -238,13 +238,7 @@ const ImageContainer = ({ auth }) => {
                   </Fragment>
                 ))}
               </Grid>
-              <Grid
-                container
-                direction='column'
-                justify='center'
-                alignItems='center'
-                xs={2}
-              >
+              <Grid xs={12}>
                 <Button>
                   <UndoIcon
                     onClick={undo}
@@ -252,12 +246,8 @@ const ImageContainer = ({ auth }) => {
                     fontSize='large'
                   />
                 </Button>
-                <DoubleArrowIcon
-                  className={classes.arrowIcon}
-                  fontSize='large'
-                />
               </Grid>
-              <Grid xs={5}>
+              <Grid xs={12}>
                 <canvas
                   ref={pictureRef}
                   width={canvasSize[1]}

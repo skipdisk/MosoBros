@@ -1,6 +1,7 @@
 import React, { useState, useRef, Fragment } from 'react'
 import { connect } from 'react-redux'
 import ImageUploader from 'react-images-upload'
+import Typing from 'react-typing-animation'
 
 //materialUI
 import Slider from '@material-ui/core/Slider'
@@ -11,6 +12,7 @@ import DoubleArrowIcon from '@material-ui/icons/DoubleArrow'
 import UndoIcon from '@material-ui/icons/Replay'
 
 //local
+import logo from '../crown.png'
 import Header from '../layout/Header'
 import ImageHistogram from '../image-histogram/ImageHistogram'
 import ImageScatterPlot from '../image-scatterplot/ImageScatterPlot'
@@ -94,6 +96,7 @@ const ImageContainer = () => {
 
   const edgeDetection = () => {
     const myImageData = Sobel(pictureRef)
+    console.log(myImageData)
     setImageData(myImageData)
   }
 
@@ -248,15 +251,35 @@ const ImageContainer = () => {
             </Grid>
           </Fragment>
         ) : (
-          <ImageUploader
-            withIcon={true}
-            buttonText='Choose images'
-            onChange={onDrop}
-            imgExtension={['.jpg', '.gif', '.png', '.gif', '.jpeg']}
-            maxFileSize={5242880}
-            singleImage={true}
-            // withPreview={true}
-          />
+          <Grid container spacing={1} justify='center' alignItems='center'>
+            <Grid
+              container
+              direction='row'
+              justify='center'
+              alignItems='center'
+            >
+              <img src={logo} alt='fireeee' />
+              <span className={classes.firstTitle}>Moso</span>
+              <span className={classes.secondTitle}>BROS</span>
+            </Grid>
+            <Typing speed={100} loop={true}>
+              <span className={classes.typingText}>
+                Select an image to start editing!
+              </span>
+              <Typing.Delay ms={2000} />
+              <Typing.Reset count={1} delay={1000} />
+            </Typing>
+            <ImageUploader
+              className={classes.imageUploader}
+              withIcon={true}
+              buttonText='Choose images'
+              onChange={onDrop}
+              imgExtension={['.jpg', '.gif', '.png', '.gif', '.jpeg']}
+              maxFileSize={5242880}
+              singleImage={true}
+              // withPreview={true}
+            />
+          </Grid>
         )}
       </Grid>
     </div>

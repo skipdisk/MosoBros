@@ -4,8 +4,9 @@ import { connect } from 'react-redux'
 //import * as actions from '../actions';
 import { fetchUser } from '../store/actions/authActions'
 import Header from './layout/Header'
-import Landing from './layout/Landing'
 import Dashboard from './layout/Dashboard'
+
+import './App.css'
 
 class App extends Component {
   componentDidMount () {

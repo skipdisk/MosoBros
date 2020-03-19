@@ -6,15 +6,30 @@ const MyChart = ({ imageData }) => {
   const [histogramData, setHistogramData] = useState([
     {
       label: 'Blue',
-      data: [{ x: 1, y: 10 }]
+      data: [
+        {
+          x: 1,
+          y: 10
+        }
+      ]
     },
     {
       label: 'Red',
-      data: [{ x: 1, y: 10 }]
+      data: [
+        {
+          x: 1,
+          y: 10
+        }
+      ]
     },
     {
       label: 'Green',
-      data: [{ x: 1, y: 10 }]
+      data: [
+        {
+          x: 1,
+          y: 10
+        }
+      ]
     }
   ])
 
@@ -64,13 +79,19 @@ const MyChart = ({ imageData }) => {
         data: [...greenHistogram]
       }
     ])
-    console.log(histogramData)
   }
 
   const axes = React.useMemo(
     () => [
-      { primary: true, type: 'linear', position: 'bottom' },
-      { type: 'linear', position: 'left' }
+      {
+        primary: true,
+        type: 'linear',
+        position: 'bottom'
+      },
+      {
+        type: 'linear',
+        position: 'left'
+      }
     ],
     []
   )
@@ -82,7 +103,7 @@ const MyChart = ({ imageData }) => {
         height: '300px'
       }}
     >
-      <Button onClick={updateData}>Run</Button>
+      <Button onClick={updateData}> Run </Button>{' '}
       <Chart data={histogramData} axes={axes} tooltip />
     </div>
   )

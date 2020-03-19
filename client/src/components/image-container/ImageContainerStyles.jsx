@@ -62,5 +62,8 @@ export const ImageContainerStyles = makeStyles({
   logo: {
     display: 'flex',
     width: '50px'
+  },
+  credits: {
+    marginTop: 200
   }
 })

@@ -10,6 +10,8 @@ import Button from '@material-ui/core/Button'
 import Drawer from '@material-ui/core/Drawer'
 import DoubleArrowIcon from '@material-ui/icons/DoubleArrow'
 import UndoIcon from '@material-ui/icons/Replay'
+import Typography from '@material-ui/core/Typography'
+import Payments from '../payment/Payments'
 
 //local
 import logo from '../crown.png'
@@ -25,7 +27,7 @@ import {
   Sobel
 } from '../../functions/image-functions'
 
-const ImageContainer = () => {
+const ImageContainer = ({ auth }) => {
   const classes = ImageContainerStyles()
   const [pictures, setPictures] = useState([])
   const [pixelData, setPixelData] = useState([])
@@ -204,9 +206,21 @@ const ImageContainer = () => {
                   Histogram
                 </Button>
                 <Button onClick={() => setShowMSD(!showMSD)}>Mean & SD</Button>
+                <div className={classes.credits}>
+                  <Payments />
+                  <Typography style={{ marginTop: '10px' }}>
+                    Credits: {auth.credits}
+                  </Typography>
+                </div>
               </Drawer>
             </Grid>
-            <Grid xs={10} container justify='center' alignItems='center'>
+            <Grid
+              xs={10}
+              container
+              direction='column'
+              justify='center'
+              alignItems='center'
+            >
               <Grid xs={5}>
                 {pictures.map((file, i) => (
                   <Fragment>
@@ -302,4 +316,10 @@ const ImageContainer = () => {
   )
 }
 
-export default connect(null)(ImageContainer)
+const mapStateToProps = ({ auth }) => {
+  return {
+    auth: auth
+  }
+}
+
+export default connect(mapStateToProps)(ImageContainer)

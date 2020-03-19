@@ -105,7 +105,7 @@ const MyScatterChart = ({ imageData, canvas, image }) => {
         height: "300px"
       }}
     >
-      <Button onClick={updateData}>Cut Image Up</Button>
+      <Button onClick={updateData}>Break Image Up And Get Mean and SD</Button>
       <Chart
         data={scatterData}
         axes={axes}

@@ -1,11 +1,11 @@
 import React, { useState, useRef, Fragment } from 'react'
 import { connect } from 'react-redux'
-import { Button } from '@material-ui/core'
 import ImageUploader from 'react-images-upload'
 
 //materialUI
 import Slider from '@material-ui/core/Slider'
 import Grid from '@material-ui/core/Grid'
+import Button from '@material-ui/core/Button'
 import Drawer from '@material-ui/core/Drawer'
 import DoubleArrowIcon from '@material-ui/icons/DoubleArrow'
 import UndoIcon from '@material-ui/icons/Replay'
@@ -20,7 +20,8 @@ import {
   imageBrightness,
   imageContrast,
   imageGreyscale,
-  imageInvert
+  imageInvert,
+  Sobel
 } from '../../functions/image-functions'
 
 const ImageContainer = () => {
@@ -91,6 +92,11 @@ const ImageContainer = () => {
     setImageData(myImageData)
   }
 
+  const edgeDetection = () => {
+    const myImageData = Sobel(pictureRef)
+    setImageData(myImageData)
+  }
+
   const imageToCanvas = file => {
     const image = new Image()
     let newBlob = file
@@ -150,6 +156,7 @@ const ImageContainer = () => {
                 <Button onClick={invert}>Invert</Button>
                 <Button onClick={greyscale}>Grey Scale</Button>
                 <Button onClick={blurring}>Blurring</Button>
+                <Button onClick={edgeDetection}>Edge Detection</Button>
                 <Button onClick={() => setShowBrightness(!showBrightness)}>
                   Brightness
                 </Button>
@@ -205,11 +212,13 @@ const ImageContainer = () => {
                 alignItems='center'
                 xs={2}
               >
-                <UndoIcon
-                  onClick={undo}
-                  className={classes.undoIcon}
-                  fontSize='large'
-                />
+                <Button>
+                  <UndoIcon
+                    onClick={undo}
+                    className={classes.undoIcon}
+                    fontSize='large'
+                  />
+                </Button>
                 <DoubleArrowIcon
                   className={classes.arrowIcon}
                   fontSize='large'

@@ -16,9 +16,18 @@ export const ImageContainerStyles = makeStyles({
     flexDirection: 'column',
     height: '100%'
   },
+  menuButton: {
+    '&:hover': {
+      backgroundColor: '#641eed',
+      color: '#fff'
+    }
+  },
   drawer: {
     width: 150,
-    flexGrow: 1
+    flexGrow: 1,
+    '& > div': {
+      boxShadow: '1px 1px 6px 1px'
+    }
     // flexShrink: 0
   },
   drawerPaper: {
@@ -64,6 +73,6 @@ export const ImageContainerStyles = makeStyles({
     width: '50px'
   },
   credits: {
-    marginTop: 200
+    marginTop: 220
   }
 })

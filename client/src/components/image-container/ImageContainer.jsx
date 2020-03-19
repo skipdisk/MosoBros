@@ -8,7 +8,6 @@ import Slider from '@material-ui/core/Slider'
 import Grid from '@material-ui/core/Grid'
 import Button from '@material-ui/core/Button'
 import Drawer from '@material-ui/core/Drawer'
-import DoubleArrowIcon from '@material-ui/icons/DoubleArrow'
 import UndoIcon from '@material-ui/icons/Replay'
 import Typography from '@material-ui/core/Typography'
 import Payments from '../payment/Payments'
@@ -148,6 +147,7 @@ const ImageContainer = ({ auth }) => {
               justify='flex-start'
               alignItems='flex-start'
               xs={2}
+              style={{ background: '#000000' }}
             >
               <Drawer
                 className={classes.drawer}
@@ -174,11 +174,22 @@ const ImageContainer = ({ auth }) => {
                   <span className={classes.firstTitle2}>Moso</span>
                   <span className={classes.secondTitle2}>BROS</span>
                 </Grid>
-                <Button onClick={invert}>Invert</Button>
-                <Button onClick={greyscale}>Grey Scale</Button>
-                <Button onClick={blurring}>Blurring</Button>
-                <Button onClick={edgeDetection}>Edge Detection</Button>
-                <Button onClick={() => setShowBrightness(!showBrightness)}>
+                <Button className={classes.menuButton} onClick={invert}>
+                  Invert
+                </Button>
+                <Button className={classes.menuButton} onClick={greyscale}>
+                  Grey Scale
+                </Button>
+                <Button className={classes.menuButton} onClick={blurring}>
+                  Blurring
+                </Button>
+                <Button className={classes.menuButton} onClick={edgeDetection}>
+                  Edge Detection
+                </Button>
+                <Button
+                  className={classes.menuButton}
+                  onClick={() => setShowBrightness(!showBrightness)}
+                >
                   Brightness
                 </Button>
                 {showBrightness ? (
@@ -190,7 +201,10 @@ const ImageContainer = ({ auth }) => {
                     max={100}
                   />
                 ) : null}
-                <Button onClick={() => setShowContrast(!showContrast)}>
+                <Button
+                  className={classes.menuButton}
+                  onClick={() => setShowContrast(!showContrast)}
+                >
                   Contrast
                 </Button>
                 {showContrast ? (
@@ -202,10 +216,18 @@ const ImageContainer = ({ auth }) => {
                     max={50}
                   />
                 ) : null}{' '}
-                <Button onClick={() => setShowHistoGram(!showHistogram)}>
+                <Button
+                  className={classes.menuButton}
+                  onClick={() => setShowHistoGram(!showHistogram)}
+                >
                   Histogram
                 </Button>
-                <Button onClick={() => setShowMSD(!showMSD)}>Mean & SD</Button>
+                <Button
+                  className={classes.menuButton}
+                  onClick={() => setShowMSD(!showMSD)}
+                >
+                  Mean & SD
+                </Button>
                 <div className={classes.credits}>
                   <Payments />
                   <Typography style={{ marginTop: '10px' }}>

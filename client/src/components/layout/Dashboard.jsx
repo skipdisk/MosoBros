@@ -2,7 +2,9 @@ import React, { Fragment } from 'react'
 import { makeStyles } from '@material-ui/core/styles'
 import ImageContainer from '../image-container/ImageContainer'
 import Button from '@material-ui/core/Button'
+import ExitToAppIcon from '@material-ui/icons/ExitToApp'
 import { connect } from 'react-redux'
+import 'font-awesome/css/font-awesome.min.css'
 
 const useStyles = makeStyles(theme => ({
   root: {
@@ -14,7 +16,8 @@ const useStyles = makeStyles(theme => ({
   },
   navButton: {
     textDecoration: 'none',
-    textTransform: 'none'
+    textTransform: 'none',
+    color: '#641eed'
   },
   buttonContainer: {
     position: 'absolute',
@@ -33,17 +36,15 @@ const Dashboard = ({ auth }) => {
         return (
           <Button>
             <a className={classes.navButton} href='/auth/google'>
-              Login With Google
+              SIGN IN <i class='fa fa-google fa-2x' aria-hidden='true'></i>
             </a>
           </Button>
         )
       default:
         return (
           <Fragment>
-            <Button>
-              <a className={classes.navButton} href='/api/logout'>
-                Logout
-              </a>
+            <Button href='/api/logout'>
+              <ExitToAppIcon style={{ color: '#641eed' }} />
             </Button>
           </Fragment>
         )

@@ -5,7 +5,7 @@ export const ImageContainerStyles = makeStyles({
     flexGrow: 1
   },
   pictureContainer: {
-    marginTop: '1rem'
+    marginTop: '5rem'
   },
   histogram: {
     margin: '2rem'
@@ -44,8 +44,23 @@ export const ImageContainerStyles = makeStyles({
     fontWeight: '800',
     color: '#641eed'
   },
+  firstTitle2: {
+    fontSize: '20px',
+    fontWeight: '500',
+    marginBottom: '2rem'
+  },
+  secondTitle2: {
+    fontSize: '30px',
+    fontWeight: '800',
+    color: '#641eed',
+    marginBottom: '2rem'
+  },
   typingText: {
     fontSize: '25px',
     color: '#505050'
+  },
+  logo: {
+    display: 'flex',
+    width: '50px'
   }
 })

@@ -13,7 +13,6 @@ import UndoIcon from '@material-ui/icons/Replay'
 
 //local
 import logo from '../crown.png'
-import Header from '../layout/Header'
 import ImageHistogram from '../image-histogram/ImageHistogram'
 import ImageScatterPlot from '../image-scatterplot/ImageScatterPlot'
 import { ImageContainerStyles } from './ImageContainerStyles'
@@ -132,12 +131,12 @@ const ImageContainer = () => {
 
   return (
     <div>
-      {pictures.length ? <Header /> : null}
       <Grid
         className={classes.pictureContainer}
         container
         justify='space-between'
         alignItems='center'
+        xs={12}
       >
         {pictures.length ? (
           <Fragment>
@@ -156,6 +155,23 @@ const ImageContainer = () => {
                 }}
                 anchor='left'
               >
+                <Grid
+                  container
+                  direction='column'
+                  justify='center'
+                  alignItems='center'
+                >
+                  <img src={logo} className={classes.logo} alt='fireeee' />
+                </Grid>
+                <Grid
+                  container
+                  direction='row'
+                  justify='center'
+                  alignItems='center'
+                >
+                  <span className={classes.firstTitle2}>Moso</span>
+                  <span className={classes.secondTitle2}>BROS</span>
+                </Grid>
                 <Button onClick={invert}>Invert</Button>
                 <Button onClick={greyscale}>Grey Scale</Button>
                 <Button onClick={blurring}>Blurring</Button>

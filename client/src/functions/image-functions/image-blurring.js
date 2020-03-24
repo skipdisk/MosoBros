@@ -14,7 +14,7 @@ function blurringHelper(canvas, callback) {
         myImageData.data[i + 1] = channels.g
         myImageData.data[i + 2] = channels.b
         myImageData.data[i + 3] = channels.a
-        //
+
     }
 
     return myImageData

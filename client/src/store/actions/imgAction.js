@@ -1,8 +1,5 @@
 import axios from 'axios'
 import FormData from 'form-data'
-import {
-    createHistograms
-} from './createHistogram'
 
 
 const dataURLtoFile = (dataurl, filename) => {
@@ -72,18 +69,26 @@ export const imageHistogram = (imgURL) => async dispatch => {
 
     // generate file from base64 string
     // const image = dataURLtoFile(img)
-    var image = dataURLtoFile(imgURL);
+    var image = dataURItoBlob(imgURL);
+
+    const data = new FormData(document.forms[0])
+    data.append('file', image, image.name)
 
 
+    // const histograms = createHistograms('http://localhost:5000/services/uploads/test.png')
 
 
-    const histograms = createHistograms('http://localhost:5000/services/uploads/test.png')
+    const config = {
+        headers: {
+            'Content-Type': 'multipart/form-data'
+        }
+    }
+    const response = await axios.post('/api/histogram', data, config)
 
-
-    dispatch({
-        type: 'IMAGE_HISTOGRAM',
-        histograms: histograms
-    })
+    // dispatch({
+    //     type: 'IMAGE_HISTOGRAM',
+    //     histograms: histograms
+    // })
 
 };
 

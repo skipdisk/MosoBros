@@ -4,8 +4,8 @@ const imageUpload = require('../services/imageUpload')
 const express = require('express')
 const path = require('path')
 const {
-    createHistogram
-} = require('../client/src/store/actions/createHistogram')
+    createHistograms
+} = require('../utils/createHistogram')
 
 const {
     spawn
@@ -38,8 +38,9 @@ module.exports = app => {
     })
 
     app.post('/api/histogram', async (req, res) => {
-        // const histograms = createHistogram(req.image)
-        console.log(req)
+        const histograms = createHistograms('http://localhost:5000/services/uploads/test.png')
+        console.log(histograms)
+        // console.log(req.data)
         // res.send(histograms)
     })
 

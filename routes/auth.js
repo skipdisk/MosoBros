@@ -11,7 +11,11 @@ module.exports = app => {
     app.get('/auth/google/callback',
         passport.authenticate('google'),
         (req, res) => {
+<<<<<<< HEAD
             res.redirect('/');
+=======
+            res.redirect('/dashboard');
+>>>>>>> 56115240091b7d6bc964b8e3bd52baa0684c8fb4
         }
     );
 };

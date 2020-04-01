@@ -4,6 +4,7 @@ import ImageUploader from "react-images-upload";
 import Typing from "react-typing-animation";
 
 //materialUI
+import Input from "@material-ui/core/Input";
 import Slider from "@material-ui/core/Slider";
 import Grid from "@material-ui/core/Grid";
 import Button from "@material-ui/core/Button";
@@ -23,9 +24,10 @@ import {
   imageContrast,
   imageGreyscale,
   imageInvert,
-  Sobel
+  imageNormalize,
+  Sobel,
+  getPixelData
 } from "../../functions/image-functions";
-import imageNormalize from "../../functions/image-functions/image-normalize";
 
 const ImageContainer = ({ auth }) => {
   const classes = ImageContainerStyles();
@@ -38,6 +40,9 @@ const ImageContainer = ({ auth }) => {
   const [showBrightness, setShowBrightness] = useState(false);
   const [brightnessValue, setBrightnessValue] = useState(50);
   const [showContrast, setShowContrast] = useState(false);
+  const [showPixelXY, setShowPixelXY] = useState(false);
+  const [xValue, setXValue] = useState(0);
+  const [yValue, setYValue] = useState(0);
   const [contrastValue, setContrastValue] = useState(0);
   const [showHistogram, setShowHistoGram] = useState(false);
   const [showMSD, setShowMSD] = useState(false);
@@ -66,6 +71,7 @@ const ImageContainer = ({ auth }) => {
     setPixelData(myImageData.data);
     setPixelDataArray([...pixelDataArray, myImageData]);
     ctx.putImageData(myImageData, 0, 0);
+    setOriginalCanvas(canvas);
   };
 
   const blurring = () => {
@@ -104,6 +110,18 @@ const ImageContainer = ({ auth }) => {
   const normalize = () => {
     const myImageData = imageNormalize(pictureRef);
     setImageData(myImageData);
+  };
+
+  const pixelDataXY = (pictureRef, xValue, yValue) => {
+    getPixelData(pictureRef, xValue, yValue);
+  };
+
+  const changeXValue = (event, newValue) => {
+    setXValue(newValue);
+  };
+
+  const changeYValue = (event, newValue) => {
+    setYValue(newValue);
   };
 
   const imageToCanvas = file => {
@@ -195,6 +213,43 @@ const ImageContainer = ({ auth }) => {
                 <Button className={classes.menuButton} onClick={normalize}>
                   Normalize
                 </Button>
+                {/* <Button className={classes.menuButton} onClick={pixelDataXY}>
+                  Pixel Data
+                </Button> */}
+                <Button
+                  className={classes.menuButton}
+                  onClick={() => setShowPixelXY(!showPixelXY)}
+                >
+                  Pixel Data
+                </Button>
+                {showPixelXY ? (
+                  <Grid
+                    container
+                    direction="column"
+                    justify="center"
+                    alignItems="center"
+                  >
+                    <Slider
+                      value={xValue}
+                      valueLabelDisplay={"auto"}
+                      onChange={changeXValue}
+                      min={0}
+                      step={1}
+                      max={canvasSize[1]}
+                    />
+                    <div>X-Value</div>
+                    <Slider
+                      value={yValue}
+                      valueLabelDisplay={"auto"}
+                      onChange={changeYValue}
+                      min={0}
+                      step={1}
+                      max={canvasSize[0]}
+                    />
+                    <div>Y-Value</div>
+                    <Button onClick={pixelDataXY(pictureRef, xValue, yValue)} />
+                  </Grid>
+                ) : null}
                 <Button
                   className={classes.menuButton}
                   onClick={() => setShowBrightness(!showBrightness)}
@@ -292,11 +347,7 @@ const ImageContainer = ({ auth }) => {
               ) : null}
               {showMSD ? (
                 <Grid className={classes.histogram} xs={12}>
-                  <ImageScatterPlot
-                    imageData={pixelData}
-                    canvas={originalCanvas}
-                    image={originalImage}
-                  />
+                  <ImageScatterPlot canvas={originalCanvas} />
                 </Grid>
               ) : null}
             </Grid>

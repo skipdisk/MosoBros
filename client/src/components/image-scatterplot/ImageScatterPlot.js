@@ -2,8 +2,11 @@ import React, { useState } from "react";
 import { Chart } from "react-charts";
 import { Button } from "@material-ui/core";
 
-const MyScatterChart = ({ imageData, canvas, image }) => {
-  const [pieceMeanAndSd, setPieceMeanAndSd] = useState([]);
+const MyScatterChart = ({ canvas }) => {
+  var img = new Image();
+  img.src = canvas.toDataURL();
+
+  var pieceMeanAndSd = [];
   const [scatterData, setScatterData] = useState([
     {
       label: "Blue",
@@ -37,6 +40,8 @@ const MyScatterChart = ({ imageData, canvas, image }) => {
     var numRowsToCut = 10;
     var widthOfOnePiece = canvas.width / numColsToCut;
     var heightOfOnePiece = canvas.height / numRowsToCut;
+
+    pieceMeanAndSd.length = 0;
     for (var x = 0; x < numColsToCut; ++x) {
       for (var y = 0; y < numRowsToCut; ++y) {
         var piececanvas = document.createElement("canvas");
@@ -45,7 +50,7 @@ const MyScatterChart = ({ imageData, canvas, image }) => {
         piececanvas.height = heightOfOnePiece;
         var context = piececanvas.getContext("2d");
         context.drawImage(
-          image,
+          img,
           x * widthOfOnePiece,
           y * heightOfOnePiece,
           widthOfOnePiece,
@@ -61,9 +66,7 @@ const MyScatterChart = ({ imageData, canvas, image }) => {
           widthOfOnePiece,
           heightOfOnePiece
         );
-        setPieceMeanAndSd(
-          pieceMeanAndSd.push([getMean(pieceData.data), getSD(pieceData.data)])
-        );
+        pieceMeanAndSd.push([getMean(pieceData.data), getSD(pieceData.data)]);
         imagePieces.push(canvas.toDataURL());
       }
     }
@@ -76,7 +79,7 @@ const MyScatterChart = ({ imageData, canvas, image }) => {
     cutImageUp();
     setScatterData([
       {
-        label: "Blue",
+        label: "Mean/SD",
         data: [...pieceMeanAndSd]
       }
     ]);

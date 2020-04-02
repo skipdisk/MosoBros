@@ -24,9 +24,8 @@ export const getPixelData = (pictureRef, x, y) => {
   var blueForCoord = imageData.data[blueIndex];
   var alphaForCoord = imageData.data[alphaIndex];
 
-  console.log(redForCoord);
-  console.log(greenForCoord);
-  console.log(blueForCoord);
-  console.log(alphaForCoord);
-  console.log(imageData.data);
+  console.log("Red: " + redForCoord);
+  console.log("Green: " + greenForCoord);
+  console.log("Blue: " + blueForCoord);
+  console.log("Aplha: " + alphaForCoord);
 };

@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { Chart } from "react-charts";
 import { Button } from "@material-ui/core";
 
-const MyScatterChart = ({ canvas }) => {
+const MyScatterChart = ({ canvas, gridsize }) => {
   var img = new Image();
   img.src = canvas.toDataURL();
 
@@ -36,14 +36,14 @@ const MyScatterChart = ({ canvas }) => {
 
   const cutImageUp = () => {
     var imagePieces = [];
-    var numColsToCut = 10;
-    var numRowsToCut = 10;
+    var numColsToCut = gridsize;
+    var numRowsToCut = gridsize;
     var widthOfOnePiece = canvas.width / numColsToCut;
     var heightOfOnePiece = canvas.height / numRowsToCut;
 
     pieceMeanAndSd.length = 0;
-    for (var x = 0; x < numColsToCut; ++x) {
-      for (var y = 0; y < numRowsToCut; ++y) {
+    for (var x = 0; x < widthOfOnePiece; ++x) {
+      for (var y = 0; y < heightOfOnePiece; ++y) {
         var piececanvas = document.createElement("canvas");
         var pieceData;
         piececanvas.width = widthOfOnePiece;
@@ -67,9 +67,11 @@ const MyScatterChart = ({ canvas }) => {
           heightOfOnePiece
         );
         pieceMeanAndSd.push([getMean(pieceData.data), getSD(pieceData.data)]);
-        imagePieces.push(canvas.toDataURL());
+        imagePieces.push(piececanvas.toDataURL());
       }
     }
+    console.log(pieceMeanAndSd);
+    console.log(imagePieces);
     var imagePiecesFiltered = imagePieces.filter(function(x) {
       return x !== undefined;
     });

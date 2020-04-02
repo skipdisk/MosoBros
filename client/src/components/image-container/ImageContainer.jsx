@@ -43,10 +43,13 @@ const ImageContainer = ({ auth }) => {
   const [showPixelXY, setShowPixelXY] = useState(false);
   const [xValue, setXValue] = useState(0);
   const [yValue, setYValue] = useState(0);
+  const [showGrid, setShowGrid] = useState(false);
+  const [gridSize, setGridSize] = useState(10);
   const [contrastValue, setContrastValue] = useState(0);
   const [showHistogram, setShowHistoGram] = useState(false);
   const [showMSD, setShowMSD] = useState(false);
   const pictureRef = useRef(null);
+  const gridRef = useRef(null);
 
   const changeCanvasSize = imageUrl => {
     var img = new Image();
@@ -150,9 +153,24 @@ const ImageContainer = ({ auth }) => {
     ctx.putImageData(newPixelArray[newPixelArray.length - 1], 0, 0);
   };
 
-  // const uploadImages = () => {
-  //   dispatch(imageUpload(pictureRef.current.toDataURL()))
-  // }
+  const gridToCanvas = (event, newValue) => {
+    const gridCanvas = gridRef.current;
+    const gridCtx = gridCanvas.getContext("2d");
+    gridCtx.clearRect(0, 0, canvasSize[1], canvasSize[0]);
+    gridCtx.beginPath();
+    for (var x = 0; x <= canvasSize[1]; x += newValue) {
+      gridCtx.moveTo(0.2 + x + 0, 0);
+      gridCtx.lineTo(0.2 + x + 0, canvasSize[0] + 0);
+    }
+
+    for (var x = 0; x <= canvasSize[0]; x += newValue) {
+      gridCtx.moveTo(0, 0.2 + x + 0);
+      gridCtx.lineTo(canvasSize[1] + 0, 0.2 + x + 0);
+    }
+    gridCtx.strokeStyle = "black";
+    gridCtx.stroke();
+    setGridSize(newValue);
+  };
 
   return (
     <div>
@@ -213,9 +231,61 @@ const ImageContainer = ({ auth }) => {
                 <Button className={classes.menuButton} onClick={normalize}>
                   Normalize
                 </Button>
-                {/* <Button className={classes.menuButton} onClick={pixelDataXY}>
-                  Pixel Data
-                </Button> */}
+                <Button
+                  className={classes.menuButton}
+                  onClick={() => setShowBrightness(!showBrightness)}
+                >
+                  Brightness
+                </Button>
+                {showBrightness ? (
+                  <Slider
+                    value={brightnessValue}
+                    onChangeCommitted={handleBrightnessChange}
+                    min={0}
+                    step={1}
+                    max={100}
+                  />
+                ) : null}
+                <Button
+                  className={classes.menuButton}
+                  onClick={() => setShowContrast(!showContrast)}
+                >
+                  Contrast
+                </Button>
+                {showContrast ? (
+                  <Slider
+                    value={contrastValue}
+                    onChangeCommitted={handleContrastChange}
+                    min={-50}
+                    step={1}
+                    max={50}
+                  />
+                ) : null}{" "}
+                <Button
+                  className={classes.menuButton}
+                  onClick={() => {
+                    setShowGrid(!showGrid);
+                  }}
+                >
+                  Grid
+                </Button>
+                {showGrid ? (
+                  <Grid
+                    container
+                    direction="column"
+                    justify="center"
+                    alignItems="center"
+                  >
+                    <Slider
+                      value={gridSize}
+                      valueLabelDisplay={"auto"}
+                      onChange={gridToCanvas}
+                      min={2}
+                      step={2}
+                      max={canvasSize[1] / 2}
+                    />
+                  </Grid>
+                ) : null}
                 <Button
                   className={classes.menuButton}
                   onClick={() => setShowPixelXY(!showPixelXY)}
@@ -250,36 +320,6 @@ const ImageContainer = ({ auth }) => {
                     <Button onClick={pixelDataXY(pictureRef, xValue, yValue)} />
                   </Grid>
                 ) : null}
-                <Button
-                  className={classes.menuButton}
-                  onClick={() => setShowBrightness(!showBrightness)}
-                >
-                  Brightness
-                </Button>
-                {showBrightness ? (
-                  <Slider
-                    value={brightnessValue}
-                    onChangeCommitted={handleBrightnessChange}
-                    min={0}
-                    step={1}
-                    max={100}
-                  />
-                ) : null}
-                <Button
-                  className={classes.menuButton}
-                  onClick={() => setShowContrast(!showContrast)}
-                >
-                  Contrast
-                </Button>
-                {showContrast ? (
-                  <Slider
-                    value={contrastValue}
-                    onChangeCommitted={handleContrastChange}
-                    min={-50}
-                    step={1}
-                    max={50}
-                  />
-                ) : null}{" "}
                 <Button
                   className={classes.menuButton}
                   onClick={() => setShowHistoGram(!showHistogram)}
@@ -334,11 +374,36 @@ const ImageContainer = ({ auth }) => {
                 </Button>
               </Grid>
               <Grid xs={12}>
-                <canvas
-                  ref={pictureRef}
+                <div
+                  position={"relative"}
                   width={canvasSize[1]}
                   height={canvasSize[0]}
-                />
+                >
+                  <canvas
+                    ref={pictureRef}
+                    left={0}
+                    top={0}
+                    position={"absolute"}
+                    width={canvasSize[1]}
+                    height={canvasSize[0]}
+                  />
+                  {showGrid ? (
+                    <div
+                      left={0}
+                      top={0}
+                      position={"absolute"}
+                      width={canvasSize[1]}
+                      height={canvasSize[0]}
+                    >
+                      <canvas
+                        ref={gridRef}
+                        opacity={0.5}
+                        width={canvasSize[1]}
+                        height={canvasSize[0]}
+                      />
+                    </div>
+                  ) : null}
+                </div>
               </Grid>
               {showHistogram ? (
                 <Grid className={classes.histogram} xs={12}>
@@ -347,7 +412,10 @@ const ImageContainer = ({ auth }) => {
               ) : null}
               {showMSD ? (
                 <Grid className={classes.histogram} xs={12}>
-                  <ImageScatterPlot canvas={originalCanvas} />
+                  <ImageScatterPlot
+                    canvas={originalCanvas}
+                    gridsize={gridSize}
+                  />
                 </Grid>
               ) : null}
             </Grid>

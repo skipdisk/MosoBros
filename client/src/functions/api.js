@@ -9,18 +9,18 @@ var data;
 var meanAndStdOfPieces = [];
 
 const getData = () => {
-  return data;
-};
+  return data
+}
 
-function blobToCanvas(blob) {
-  var newBlob = blob;
-  var stdDev = document.getElementById("standardDeviation");
-  var mean = document.getElementById("mean");
-  var canvas = document.getElementsByClassName("canvas");
-  var img = document.getElementsByClassName("img");
-  var oldBrightnessvalue = 0;
-  var oldContrastvalue = 0;
-  const image = new Image();
+function blobToCanvas (blob) {
+  var newBlob = blob
+  var stdDev = document.getElementById('standardDeviation')
+  var mean = document.getElementById('mean')
+  var canvas = document.getElementsByClassName('canvas')
+  var img = document.getElementsByClassName('img')
+  var oldBrightnessvalue = 0
+  var oldContrastvalue = 0
+  const image = new Image()
   for (var i = 0; i < canvas.length; i++) {
     var pctx = canvas[i];
     var ctx = pctx.getContext("2d");
@@ -78,12 +78,12 @@ function blobToCanvas(blob) {
       }
 
       var getHistogram = () => {
-        var histogram = document.createElement("Histogram");
-        console.log(histogram);
-        var bin = Array.from(Array(256).keys());
-        histogram.yValues = data;
-        histogram.xLabels = bin;
-      };
+        var histogram = document.createElement('Histogram')
+        console.log(histogram)
+        var bin = Array.from(Array(256).keys())
+        histogram.yValues = data
+        histogram.xLabels = bin
+      }
 
       // Arithmetic mean
       let getMean = function(data) {
@@ -91,8 +91,8 @@ function blobToCanvas(blob) {
           data.reduce(function(a, b) {
             return Number(a) + Number(b);
           }) / data.length
-        );
-      };
+        )
+      }
 
       // Standard deviation
       let getSD = function(data) {
@@ -113,12 +113,12 @@ function blobToCanvas(blob) {
       //INVERT COLORS OF PICTURE
       var invert = function() {
         for (var i = 0; i < data.length; i += 4) {
-          data[i] = 255 - data[i]; // red
-          data[i + 1] = 255 - data[i + 1]; // green
-          data[i + 2] = 255 - data[i + 2]; // blue
+          data[i] = 255 - data[i] // red
+          data[i + 1] = 255 - data[i + 1] // green
+          data[i + 2] = 255 - data[i + 2] // blue
         }
-        ctx.putImageData(imageData, 0, 0);
-      };
+        ctx.putImageData(imageData, 0, 0)
+      }
 
       //NORMALIZE IMAGE
       var normalize = function() {
@@ -143,59 +143,59 @@ function blobToCanvas(blob) {
       //GRAYSCALE COLORS OF PICTURE
       var grayscale = function() {
         for (var i = 0; i < data.length; i += 4) {
-          var avg = (data[i] + data[i + 1] + data[i + 2]) / 3;
-          data[i] = avg; // red
-          data[i + 1] = avg; // green
-          data[i + 2] = avg; // blue
+          var avg = (data[i] + data[i + 1] + data[i + 2]) / 3
+          data[i] = avg // red
+          data[i + 1] = avg // green
+          data[i + 2] = avg // blue
         }
-        ctx.putImageData(imageData, 0, 0);
-      };
+        ctx.putImageData(imageData, 0, 0)
+      }
 
-      function blurringHelper(imageData, callback) {
+      function blurringHelper (imageData, callback) {
         for (var i = 0; i < data.length; i += 4) {
-          var r = data[i];
-          var g = data[i + 1];
-          var b = data[i + 2];
-          var a = data[i + 3];
+          var r = data[i]
+          var g = data[i + 1]
+          var b = data[i + 2]
+          var a = data[i + 3]
 
-          var channels = callback(r, g, b, a, imageData.data, i);
+          var channels = callback(r, g, b, a, imageData.data, i)
 
-          imageData.data[i] = channels.r;
-          imageData.data[i + 1] = channels.g;
-          imageData.data[i + 2] = channels.b;
-          imageData.data[i + 3] = channels.a;
-          //
+          imageData.data[i] = channels.r
+          imageData.data[i + 1] = channels.g
+          imageData.data[i + 2] = channels.b
+          imageData.data[i + 3] = channels.a
         }
 
-        ctx.putImageData(imageData, 0, 0);
+        ctx.putImageData(imageData, 0, 0)
       }
 
       //Uses the gaussian blur on the pictures on a 3x3 area
-      function blurring() {
-        const w = pctx.width * 4;
+      function blurring (e) {
+        const inputEdgeArray = e.target.value.split(',')
+        const w = pctx.width * 4
         // the offset index for each pixel excluding the center pixel
-        const grid = [-w - 4, -w, -w + 4, -4, 4, w - 4, w, w + 4];
+        const grid = [-w - 4, -w, -w + 4, -4, 4, w - 4, w, w + 4]
 
         blurringHelper(imageData, (r, g, b, a, dat, i) => {
-          var idx, count;
-          r *= r;
-          g *= g;
-          b *= b;
-          count = 1;
+          var idx, count
+          r *= r
+          g *= g
+          b *= b
+          count = 1
           for (idx = 0; idx < grid.length; idx++) {
-            const off = grid[idx];
+            const off = grid[idx]
             if (i + off >= 0 && i + off < w * pctx.height) {
-              r += dat[i + off] * dat[i + off];
-              g += dat[i + 1 + off] * dat[i + 1 + off];
-              b += dat[i + 2 + off] * dat[i + 2 + off];
-              a += dat[i + 3 + off];
-              count++;
+              r += dat[i + off] * dat[i + off] * 2
+              g += dat[i + 1 + off] * dat[i + 1 + off]
+              b += dat[i + 2 + off] * dat[i + 2 + off]
+              a += dat[i + 3 + off]
+              count++
             }
           }
-          r = Math.sqrt(r / count);
-          g = Math.sqrt(g / count);
-          b = Math.sqrt(b / count);
-          a = a / count;
+          r = Math.sqrt(r / count)
+          g = Math.sqrt(g / count)
+          b = Math.sqrt(b / count)
+          a = a / count
           return {
             r,
             g,
@@ -227,29 +227,29 @@ function blobToCanvas(blob) {
             console.log(data[i + 2]);
           }
         }
-      };
+      }
 
       //CONTRAST OF PICTURE
-      function truncateColor(value) {
+      function truncateColor (value) {
         if (value < 0) {
-          value = 0;
+          value = 0
         } else if (value > 255) {
-          value = 255;
+          value = 255
         }
 
-        return value;
+        return value
       }
       var applyContrast = function(data, contrast) {
         var factor =
           (259.0 * (contrast + 255.0)) / (255.0 * (259.0 - contrast));
 
         for (var i = 0; i < data.length; i += 4) {
-          data[i] = truncateColor(factor * (data[i] - 128.0) + 128.0);
-          data[i + 1] = truncateColor(factor * (data[i + 1] - 128.0) + 128.0);
-          data[i + 2] = truncateColor(factor * (data[i + 2] - 128.0) + 128.0);
+          data[i] = truncateColor(factor * (data[i] - 128.0) + 128.0)
+          data[i + 1] = truncateColor(factor * (data[i + 1] - 128.0) + 128.0)
+          data[i + 2] = truncateColor(factor * (data[i + 2] - 128.0) + 128.0)
         }
-        return;
-      };
+        return
+      }
 
       //DECREASE CONTRAST OF PICTURE
       var dcontrast = function() {
@@ -257,12 +257,12 @@ function blobToCanvas(blob) {
         contrast = contrast / 100 + 1;
         var intercept = 128 * (1 - contrast);
         for (var i = 0; i < data.length; i += 4) {
-          data[i] = data[i] / contrast - intercept;
-          data[i + 1] = data[i + 1] / contrast - intercept;
-          data[i + 2] = data[i + 2] / contrast - intercept;
+          data[i] = data[i] / contrast - intercept
+          data[i + 1] = data[i + 1] / contrast - intercept
+          data[i + 2] = data[i + 2] / contrast - intercept
         }
-        ctx.putImageData(imageData, 0, 0);
-      };
+        ctx.putImageData(imageData, 0, 0)
+      }
 
       //CONTRAST SLIDER
       var contrastSlider = document.getElementById("contrastRange");
@@ -275,16 +275,16 @@ function blobToCanvas(blob) {
             ? parseInt(this.value) - 1
             : parseInt(this.value) + 1;
         // console.log(oldContrastvalue);
-        contrastOutput.innerHTML = this.value;
+        contrastOutput.innerHTML = this.value
         // ctx.drawImage(image, 0, 0, pctx.width, pctx.height);
         // imageData = ctx.getImageData(0, 0, pctx.width, pctx.height);
         applyContrast(
           imageData.data,
           parseInt(contrastSlider.value - oldContrastvalue, 10)
-        );
-        ctx.putImageData(imageData, 0, 0);
-        data = imageData.data;
-      });
+        )
+        ctx.putImageData(imageData, 0, 0)
+        data = imageData.data
+      })
 
       //BRIGHTNESS SLIDER
       var brightnessSlider = document.getElementById("brightnessRange");

@@ -2,8 +2,11 @@ import React, { useState } from "react";
 import { Chart } from "react-charts";
 import { Button } from "@material-ui/core";
 
-const MyScatterChart = ({ imageData, canvas, image }) => {
-  const [pieceMeanAndSd, setPieceMeanAndSd] = useState([]);
+const MyScatterChart = ({ canvas, gridsize }) => {
+  var img = new Image();
+  img.src = canvas.toDataURL();
+
+  var pieceMeanAndSd = [];
   const [scatterData, setScatterData] = useState([
     {
       label: "Blue",
@@ -33,19 +36,21 @@ const MyScatterChart = ({ imageData, canvas, image }) => {
 
   const cutImageUp = () => {
     var imagePieces = [];
-    var numColsToCut = 10;
-    var numRowsToCut = 10;
+    var numColsToCut = gridsize;
+    var numRowsToCut = gridsize;
     var widthOfOnePiece = canvas.width / numColsToCut;
     var heightOfOnePiece = canvas.height / numRowsToCut;
-    for (var x = 0; x < numColsToCut; ++x) {
-      for (var y = 0; y < numRowsToCut; ++y) {
+
+    pieceMeanAndSd.length = 0;
+    for (var x = 0; x < widthOfOnePiece; ++x) {
+      for (var y = 0; y < heightOfOnePiece; ++y) {
         var piececanvas = document.createElement("canvas");
         var pieceData;
         piececanvas.width = widthOfOnePiece;
         piececanvas.height = heightOfOnePiece;
         var context = piececanvas.getContext("2d");
         context.drawImage(
-          image,
+          img,
           x * widthOfOnePiece,
           y * heightOfOnePiece,
           widthOfOnePiece,
@@ -61,12 +66,12 @@ const MyScatterChart = ({ imageData, canvas, image }) => {
           widthOfOnePiece,
           heightOfOnePiece
         );
-        setPieceMeanAndSd(
-          pieceMeanAndSd.push([getMean(pieceData.data), getSD(pieceData.data)])
-        );
-        imagePieces.push(canvas.toDataURL());
+        pieceMeanAndSd.push([getMean(pieceData.data), getSD(pieceData.data)]);
+        imagePieces.push(piececanvas.toDataURL());
       }
     }
+    console.log(pieceMeanAndSd);
+    console.log(imagePieces);
     var imagePiecesFiltered = imagePieces.filter(function(x) {
       return x !== undefined;
     });
@@ -76,7 +81,7 @@ const MyScatterChart = ({ imageData, canvas, image }) => {
     cutImageUp();
     setScatterData([
       {
-        label: "Blue",
+        label: "Mean/SD",
         data: [...pieceMeanAndSd]
       }
     ]);
@@ -105,7 +110,7 @@ const MyScatterChart = ({ imageData, canvas, image }) => {
         height: "300px"
       }}
     >
-      <Button onClick={updateData}>Break Image Up And Get Mean and SD</Button>
+      <Button onClick={updateData}>Cut Image Up</Button>
       <Chart
         data={scatterData}
         axes={axes}

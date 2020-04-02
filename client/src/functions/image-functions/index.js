@@ -4,6 +4,18 @@ import { imageContrast } from './image-contrast';
 import { imageBrightness } from './image-brightness';
 import { imageGreyscale } from './image-greyscale';
 import { Sobel } from './image-edgeDetection';
+import { imageNormalize } from './image-normalize';
+import { getPixelData } from './image-getPixelData';
 import { imageQuantize } from './image-quantize-kMean';
 
-export { imageBlurring, imageInvert, imageContrast, imageBrightness, imageGreyscale, Sobel, imageQuantize };
+export {
+	imageBlurring,
+	imageInvert,
+	imageContrast,
+	imageBrightness,
+	imageGreyscale,
+	imageNormalize,
+	Sobel,
+	getPixelData,
+	imageQuantize
+};

@@ -1,30 +1,28 @@
 const createHistograms = (imagePath) => {
     const Jimp = require("jimp");
     const imghist = require('./histogram.js');
-    const testArray = []
 
     Jimp.read(imagePath, function (err, photo) {
         if (err) {
             console.error(err);
         } else {
             const histred = imghist.histogramRGB(imghist.colorChannels.Red, photo);
-            // saveHistogram(histred, "histred.svg");
-            testArray.push(histred.toString())
+            saveHistogram(histred, "histred.svg")
 
             const histgreen = imghist.histogramRGB(imghist.colorChannels.Green, photo);
-            // saveHistogram(histgreen, "histgreen.svg");
+            saveHistogram(histgreen, "histgreen.svg");
 
-            let histblue = imghist.histogramRGB(imghist.colorChannels.Blue, photo);
-            // saveHistogram(histblue, "histblue.svg");
-            // console.log('hi', testArray)
+            const histblue = imghist.histogramRGB(imghist.colorChannels.Blue, photo);
+            saveHistogram(histblue, "histblue.svg");
         }
     });
-    return testArray
 }
 
 
 function saveHistogram(histogramstring, filename) {
     const fs = require("fs");
+    var open = require('open');
+
 
     fs.writeFile(filename, histogramstring, function (err) {
         if (err) {
@@ -33,6 +31,9 @@ function saveHistogram(histogramstring, filename) {
             console.log(filename + ' saved');
         }
     });
+
+    open(`http://127.0.0.1:5000/${filename}`);
+
 }
 
 module.exports = {

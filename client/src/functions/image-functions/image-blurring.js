@@ -3,10 +3,10 @@ function blurringHelper(canvas, callback) {
     let myImageData = ctx.getImageData(0, 0, canvas.width, canvas.height)
 
     for (var i = 0; i < myImageData.data.length; i += 4) {
-        var r = myImageData.data[i]
-        var g = myImageData.data[i + 1]
-        var b = myImageData.data[i + 2]
-        var a = myImageData.data[i + 3]
+        var r = myImageData.data[i]//red
+        var g = myImageData.data[i + 1]//green
+        var b = myImageData.data[i + 2]//blue
+        var a = myImageData.data[i + 3]//alpha
 
         var channels = callback(r, g, b, a, myImageData.data, i)
 

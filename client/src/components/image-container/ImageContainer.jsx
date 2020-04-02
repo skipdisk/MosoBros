@@ -137,6 +137,16 @@ const ImageContainer = ({ auth }) => {
 		setYValue(newValue);
 	};
 
+	// const imageToCanvas = file => {
+	// 	const image = new Image();
+	// 	let newBlob = file;
+	// 	image.src = newBlob;
+	// 	const canvas = pictureRef.current;
+	// 	const ctx = canvas.getContext('2d');
+	// 	ctx.drawImage(image, 0, 0, canvas.width, canvas.height);
+	// 	var myImageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+	// };
+
 	const imageToCanvas = file => {
 		const image = new Image();
 		let newBlob = file;
@@ -146,272 +156,256 @@ const ImageContainer = ({ auth }) => {
 		ctx.drawImage(image, 0, 0, canvas.width, canvas.height);
 		var myImageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
 
-		const imageToCanvas = file => {
-			const image = new Image();
-			let newBlob = file;
-			image.src = newBlob;
-			const canvas = pictureRef.current;
-			const ctx = canvas.getContext('2d');
-			ctx.drawImage(image, 0, 0, canvas.width, canvas.height);
-			var myImageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+		setOriginalImage(image);
+		setOriginalCanvas(canvas);
+		setPixelData(myImageData.data);
+		setPixelDataArray([myImageData]);
+	};
 
-			setOriginalImage(image);
-			setOriginalCanvas(canvas);
-			setPixelData(myImageData.data);
-			setPixelDataArray([myImageData]);
-		};
+	const gridToCanvas = (event, newValue) => {
+		const gridCanvas = gridRef.current;
+		const gridCtx = gridCanvas.getContext('2d');
+		gridCtx.clearRect(0, 0, canvasSize[1], canvasSize[0]);
+		gridCtx.beginPath();
+		for (var x = 0; x <= canvasSize[1]; x += newValue) {
+			gridCtx.moveTo(0.2 + x + 0, 0);
+			gridCtx.lineTo(0.2 + x + 0, canvasSize[0] + 0);
+		}
 
-		const gridToCanvas = (event, newValue) => {
-			const gridCanvas = gridRef.current;
-			const gridCtx = gridCanvas.getContext('2d');
-			gridCtx.clearRect(0, 0, canvasSize[1], canvasSize[0]);
-			gridCtx.beginPath();
-			for (var x = 0; x <= canvasSize[1]; x += newValue) {
-				gridCtx.moveTo(0.2 + x + 0, 0);
-				gridCtx.lineTo(0.2 + x + 0, canvasSize[0] + 0);
-			}
+		for (var x = 0; x <= canvasSize[0]; x += newValue) {
+			gridCtx.moveTo(0, 0.2 + x + 0);
+			gridCtx.lineTo(canvasSize[1] + 0, 0.2 + x + 0);
+		}
+		gridCtx.strokeStyle = 'black';
+		gridCtx.stroke();
+		setGridSize(newValue);
+	};
 
-			for (var x = 0; x <= canvasSize[0]; x += newValue) {
-				gridCtx.moveTo(0, 0.2 + x + 0);
-				gridCtx.lineTo(canvasSize[1] + 0, 0.2 + x + 0);
-			}
-			gridCtx.strokeStyle = 'black';
-			gridCtx.stroke();
-			setGridSize(newValue);
-		};
+	const undo = () => {
+		const canvas = pictureRef.current;
+		const ctx = canvas.getContext('2d');
+		//replaces pixel array to the previous iteration with the latest changes popped
+		let newPixelArray = pixelDataArray.length > 1 ? pixelDataArray.slice(0, -1) : pixelDataArray;
+		setPixelDataArray(newPixelArray);
+		setPixelData(newPixelArray[newPixelArray.length - 1].data);
+		ctx.putImageData(newPixelArray[newPixelArray.length - 1], 0, 0);
+	};
 
-		const undo = () => {
-			const canvas = pictureRef.current;
-			const ctx = canvas.getContext('2d');
-			//replaces pixel array to the previous iteration with the latest changes popped
-			let newPixelArray = pixelDataArray.length > 1 ? pixelDataArray.slice(0, -1) : pixelDataArray;
-			setPixelDataArray(newPixelArray);
-			setPixelData(newPixelArray[newPixelArray.length - 1].data);
-			ctx.putImageData(newPixelArray[newPixelArray.length - 1], 0, 0);
-		};
+	// const uploadImages = () => {
+	//   dispatch(imageUpload(pictureRef.current.toDataURL()))
+	// }
 
-		// const uploadImages = () => {
-		//   dispatch(imageUpload(pictureRef.current.toDataURL()))
-		// }
-
-		return (
-			<div>
-				<Grid className={classes.pictureContainer} container justify="space-between" alignItems="center" xs={12}>
-					{pictures.length ? (
-						<Fragment>
-							<Grid
-								container
-								direction="column"
-								justify="flex-start"
-								alignItems="flex-start"
-								xs={2}
-								style={{ background: '#000000' }}
+	return (
+		<div>
+			<Grid className={classes.pictureContainer} container justify="space-between" alignItems="center" xs={12}>
+				{pictures.length ? (
+					<Fragment>
+						<Grid
+							container
+							direction="column"
+							justify="flex-start"
+							alignItems="flex-start"
+							xs={2}
+							style={{ background: '#000000' }}
+						>
+							<Drawer
+								className={classes.drawer}
+								variant="permanent"
+								classes={{
+									paper: classes.drawerPaper
+								}}
+								anchor="left"
 							>
-								<Drawer
-									className={classes.drawer}
-									variant="permanent"
-									classes={{
-										paper: classes.drawerPaper
+								<Grid container direction="column" justify="center" alignItems="center">
+									<img src={logo} className={classes.logo} alt="fireeee" />
+								</Grid>
+								<Grid container direction="row" justify="center" alignItems="center">
+									<span className={classes.firstTitle2}>Moso</span>
+									<span className={classes.secondTitle2}>BROS</span>
+								</Grid>
+								<Button className={classes.menuButton} onClick={invert}>
+									Invert
+								</Button>
+								<Button className={classes.menuButton} onClick={greyscale}>
+									Grey Scale
+								</Button>
+								<Button className={classes.menuButton} onClick={blurring}>
+									Blurring
+								</Button>
+								<Button className={classes.menuButton} onClick={edgeDetection}>
+									Edge Detection
+								</Button>
+								<Button className={classes.menuButton} onClick={normalize}>
+									Normalize
+								</Button>
+								<Button className={classes.menuButton} onClick={() => setShowBrightness(!showBrightness)}>
+									Brightness
+								</Button>
+								<Button className={classes.menuButton} onClick={() => setShowkMean(!showkMean)}>
+									KM-Quantize
+								</Button>
+								{showkMean ? (
+									<Fragment>
+										<Select style={{ margin: '0px 40px' }} value={kMeans} onChange={e => KMQuantize(e.target.value)}>
+											{[2, 3, 4, 5, 6, 7, 8, 9].map(k => {
+												return <MenuItem value={k}>{k}</MenuItem>;
+											})}
+										</Select>
+										<FormHelperText style={{ textAlign: 'center' }}>k-means</FormHelperText>
+									</Fragment>
+								) : null}
+								{showBrightness ? (
+									<Slider
+										value={brightnessValue}
+										onChangeCommitted={handleBrightnessChange}
+										min={0}
+										step={1}
+										max={100}
+									/>
+								) : null}
+								<Button className={classes.menuButton} onClick={() => setShowContrast(!showContrast)}>
+									Contrast
+								</Button>
+								{showContrast ? (
+									<Slider value={contrastValue} onChangeCommitted={handleContrastChange} min={-50} step={1} max={50} />
+								) : null}
+								<Button
+									className={classes.menuButton}
+									onClick={() => {
+										setShowGrid(!showGrid);
 									}}
-									anchor="left"
 								>
+									Grid
+								</Button>
+								{showGrid ? (
 									<Grid container direction="column" justify="center" alignItems="center">
-										<img src={logo} className={classes.logo} alt="fireeee" />
-									</Grid>
-									<Grid container direction="row" justify="center" alignItems="center">
-										<span className={classes.firstTitle2}>Moso</span>
-										<span className={classes.secondTitle2}>BROS</span>
-									</Grid>
-									<Button className={classes.menuButton} onClick={invert}>
-										Invert
-									</Button>
-									<Button className={classes.menuButton} onClick={greyscale}>
-										Grey Scale
-									</Button>
-									<Button className={classes.menuButton} onClick={blurring}>
-										Blurring
-									</Button>
-									<Button className={classes.menuButton} onClick={edgeDetection}>
-										Edge Detection
-									</Button>
-									<Button className={classes.menuButton} onClick={normalize}>
-										Normalize
-									</Button>
-									<Button className={classes.menuButton} onClick={() => setShowBrightness(!showBrightness)}>
-										Brightness
-									</Button>
-									<Button className={classes.menuButton} onClick={() => setShowkMean(!showkMean)}>
-										KM-Quantize
-									</Button>
-									{showkMean ? (
-										<Fragment>
-											<Select style={{ margin: '0px 40px' }} value={kMeans} onChange={e => KMQuantize(e.target.value)}>
-												{[2, 3, 4, 5, 6, 7, 8, 9].map(k => {
-													return <MenuItem value={k}>{k}</MenuItem>;
-												})}
-											</Select>
-											<FormHelperText style={{ textAlign: 'center' }}>k-means</FormHelperText>
-										</Fragment>
-									) : null}
-									{showBrightness ? (
 										<Slider
-											value={brightnessValue}
-											onChangeCommitted={handleBrightnessChange}
+											value={gridSize}
+											valueLabelDisplay={'auto'}
+											onChange={gridToCanvas}
+											min={2}
+											step={2}
+											max={canvasSize[1] / 2}
+										/>
+									</Grid>
+								) : null}
+								<Button className={classes.menuButton} onClick={() => setShowPixelXY(!showPixelXY)}>
+									Pixel Data
+								</Button>
+								{showPixelXY ? (
+									<Grid container direction="column" justify="center" alignItems="center">
+										<Slider
+											value={xValue}
+											valueLabelDisplay={'auto'}
+											onChange={changeXValue}
 											min={0}
 											step={1}
-											max={100}
+											max={canvasSize[1]}
 										/>
-									) : null}
-									<Button className={classes.menuButton} onClick={() => setShowContrast(!showContrast)}>
-										Contrast
-									</Button>
-									{showContrast ? (
+										<div>X-Value</div>
 										<Slider
-											value={contrastValue}
-											onChangeCommitted={handleContrastChange}
-											min={-50}
+											value={yValue}
+											valueLabelDisplay={'auto'}
+											onChange={changeYValue}
+											min={0}
 											step={1}
-											max={50}
+											max={canvasSize[0]}
 										/>
-									) : null}{' '}
-									<Button
-										className={classes.menuButton}
-										onClick={() => {
-											setShowGrid(!showGrid);
-										}}
-									>
-										Grid
-									</Button>
-									{showGrid ? (
-										<Grid container direction="column" justify="center" alignItems="center">
-											<Slider
-												value={gridSize}
-												valueLabelDisplay={'auto'}
-												onChange={gridToCanvas}
-												min={2}
-												step={2}
-												max={canvasSize[1] / 2}
-											/>
-										</Grid>
-									) : null}
-									<Button className={classes.menuButton} onClick={() => setShowPixelXY(!showPixelXY)}>
-										Pixel Data
-									</Button>
-									{showPixelXY ? (
-										<Grid container direction="column" justify="center" alignItems="center">
-											<Slider
-												value={xValue}
-												valueLabelDisplay={'auto'}
-												onChange={changeXValue}
-												min={0}
-												step={1}
-												max={canvasSize[1]}
-											/>
-											<div>X-Value</div>
-											<Slider
-												value={yValue}
-												valueLabelDisplay={'auto'}
-												onChange={changeYValue}
-												min={0}
-												step={1}
-												max={canvasSize[0]}
-											/>
-											<div>Y-Value</div>
-											<Button onClick={pixelDataXY(pictureRef, xValue, yValue)} />
-										</Grid>
-									) : null}
-									<Button className={classes.menuButton} onClick={() => setShowHistoGram(!showHistogram)}>
-										Histogram
-									</Button>
-									<Button className={classes.menuButton} onClick={() => setShowMSD(!showMSD)}>
-										Mean & SD
-									</Button>
-									<div className={classes.credits}>
-										<Payments />
-										<Typography style={{ marginTop: '10px' }}>Credits: {auth.credits}</Typography>
-									</div>
-								</Drawer>
-							</Grid>
-							<Grid xs={10} container direction="column" justify="center" alignItems="center">
-								<Grid xs={12}>
-									{pictures.map((file, i) => (
-										<Fragment>
-											<img
-												className="img"
-												height={canvasSize[0]}
-												width={canvasSize[1]}
-												key={i}
-												src={file}
-												onLoad={() => {
-													imageToCanvas(file);
-												}}
-												alt="preview"
-											/>
-										</Fragment>
-									))}
-								</Grid>
-								<Grid xs={12}>
-									<Button>
-										<UndoIcon onClick={undo} className={classes.undoIcon} fontSize="large" />
-									</Button>
-								</Grid>
-								<Grid xs={12}>
-									<div position={'relative'} width={canvasSize[1]} height={canvasSize[0]}>
-										<canvas
-											ref={pictureRef}
-											left={0}
-											top={0}
-											position={'absolute'}
-											width={canvasSize[1]}
-											height={canvasSize[0]}
-										/>
-										{showGrid ? (
-											<div left={0} top={0} position={'absolute'} width={canvasSize[1]} height={canvasSize[0]}>
-												<canvas ref={gridRef} opacity={0.5} width={canvasSize[1]} height={canvasSize[0]} />
-											</div>
-										) : null}
-									</div>
-								</Grid>
-								{showHistogram ? (
-									<Grid className={classes.histogram} xs={12}>
-										<ImageHistogram imageData={pixelData} />
+										<div>Y-Value</div>
+										<Button onClick={pixelDataXY(pictureRef, xValue, yValue)} />
 									</Grid>
 								) : null}
-								{showMSD ? (
-									<Grid className={classes.histogram} xs={12}>
-										<ImageScatterPlot canvas={originalCanvas} gridsize={gridSize} />
-									</Grid>
-								) : null}
-							</Grid>
-						</Fragment>
-					) : (
-						<Grid container spacing={1} justify="center" alignItems="center">
-							<Grid container direction="row" justify="center" alignItems="center">
-								<img src={logo} alt="fireeee" />
-								<span className={classes.firstTitle}>Moso</span>
-								<span className={classes.secondTitle}>BROS</span>
-							</Grid>
-							<Typing speed={100} loop={true}>
-								<span className={classes.typingText}>Select an image to start editing!</span>
-								<Typing.Delay ms={2000} />
-								<Typing.Reset count={1} delay={1000} />
-							</Typing>
-							<ImageUploader
-								className={classes.imageUploader}
-								withIcon={true}
-								buttonText="Choose images"
-								onChange={onDrop}
-								imgExtension={['.jpg', '.gif', '.png', '.gif', '.jpeg']}
-								maxFileSize={5242880}
-								singleImage={true}
-								// withPreview={true}
-							/>
+								<Button className={classes.menuButton} onClick={() => setShowHistoGram(!showHistogram)}>
+									Histogram
+								</Button>
+								<Button className={classes.menuButton} onClick={() => setShowMSD(!showMSD)}>
+									Mean & SD
+								</Button>
+								<div className={classes.credits}>
+									<Payments />
+									<Typography style={{ marginTop: '10px' }}>Credits: {auth.credits}</Typography>
+								</div>
+							</Drawer>
 						</Grid>
-					)}
-				</Grid>
-			</div>
-		);
-	};
+						<Grid xs={10} container direction="column" justify="center" alignItems="center">
+							<Grid xs={12}>
+								{pictures.map((file, i) => (
+									<Fragment>
+										<img
+											className="img"
+											height={canvasSize[0]}
+											width={canvasSize[1]}
+											key={i}
+											src={file}
+											onLoad={() => {
+												imageToCanvas(file);
+											}}
+											alt="preview"
+										/>
+									</Fragment>
+								))}
+							</Grid>
+							<Grid xs={12}>
+								<Button>
+									<UndoIcon onClick={undo} className={classes.undoIcon} fontSize="large" />
+								</Button>
+							</Grid>
+							<Grid xs={12}>
+								<div position={'relative'} width={canvasSize[1]} height={canvasSize[0]}>
+									<canvas
+										ref={pictureRef}
+										left={0}
+										top={0}
+										position={'absolute'}
+										width={canvasSize[1]}
+										height={canvasSize[0]}
+									/>
+									{showGrid ? (
+										<div left={0} top={0} position={'absolute'} width={canvasSize[1]} height={canvasSize[0]}>
+											<canvas ref={gridRef} opacity={0.5} width={canvasSize[1]} height={canvasSize[0]} />
+										</div>
+									) : null}
+								</div>
+							</Grid>
+							{showHistogram ? (
+								<Grid className={classes.histogram} xs={12}>
+									<ImageHistogram imageData={pixelData} />
+								</Grid>
+							) : null}
+							{showMSD ? (
+								<Grid className={classes.histogram} xs={12}>
+									<ImageScatterPlot canvas={originalCanvas} gridsize={gridSize} />
+								</Grid>
+							) : null}
+						</Grid>
+					</Fragment>
+				) : (
+					<Grid container spacing={1} justify="center" alignItems="center">
+						<Grid container direction="row" justify="center" alignItems="center">
+							<img src={logo} alt="fireeee" />
+							<span className={classes.firstTitle}>Moso</span>
+							<span className={classes.secondTitle}>BROS</span>
+						</Grid>
+						<Typing speed={100} loop={true}>
+							<span className={classes.typingText}>Select an image to start editing!</span>
+							<Typing.Delay ms={2000} />
+							<Typing.Reset count={1} delay={1000} />
+						</Typing>
+						<ImageUploader
+							className={classes.imageUploader}
+							withIcon={true}
+							buttonText="Choose images"
+							onChange={onDrop}
+							imgExtension={['.jpg', '.gif', '.png', '.gif', '.jpeg']}
+							maxFileSize={5242880}
+							singleImage={true}
+							// withPreview={true}
+						/>
+					</Grid>
+				)}
+			</Grid>
+		</div>
+	);
 };
 
 const mapStateToProps = ({ auth }) => {

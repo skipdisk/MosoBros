@@ -1,5 +1,6 @@
 import React, { useState, useRef, Fragment } from "react";
 import { connect, useDispatch } from "react-redux";
+import { Link } from "react-router-dom";
 import ImageUploader from "react-images-upload";
 import Typing from "react-typing-animation";
 
@@ -14,6 +15,8 @@ import Payments from "../payment/Payments";
 import MenuItem from "@material-ui/core/MenuItem";
 import Select from "@material-ui/core/Select";
 import FormHelperText from "@material-ui/core/FormHelperText";
+import Fab from "@material-ui/core/Fab";
+import PhotoIcon from "@material-ui/icons/Photo";
 
 //local
 import logo from "../crown.png";
@@ -381,10 +384,25 @@ const ImageContainer = ({ auth }) => {
                   Mean & SD
                 </Button>
                 <div className={classes.credits}>
-                  <Payments />
-                  <Typography style={{ marginTop: "10px" }}>
+                  {/* <Payments /> */}
+                  {/* <Typography style={{ marginTop: "10px" }}>
                     Credits: {auth.credits}
-                  </Typography>
+                  </Typography> */}
+                  <Link to="/userImages">
+                    <Fab
+                      style={{
+                        backgroundColor: "#641eed",
+                        color: "white",
+                        "&:hover": {
+                          backgroundColor: "#fff",
+                          color: "#641eed"
+                        }
+                      }}
+                      aria-label="add"
+                    >
+                      <PhotoIcon />
+                    </Fab>
+                  </Link>
                 </div>
               </Drawer>
             </Grid>
